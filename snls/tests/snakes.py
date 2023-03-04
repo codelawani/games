@@ -4,17 +4,19 @@ import colorama
 colorama.init()
 
 
-def assign_bead_colors(players):
-    """Assigns different colors to each player's bead.
+def assign_color(players):
+    """ assigns different colors to different player's beeds
         players: dictionary(name -> [beed,position])
         returns: dictionary(beed -> color)"""
 
-    colors = ["red", "green", "cyan", "magenta"]
-    random.shuffle(colors)
-    bead_colors = {}
-    for player_name, (bead, _) in players.items():
-        bead_colors[bead] = colors.pop()
-    return bead_colors
+    cl = ["red", "green", "cyan", "magenta"]
+    random.shuffle(cl)
+    colors = {}
+    counter = 0
+    for m in players.keys():
+        colors[players[m][0]] = cl[counter]
+        counter += 1
+    return colors
 
 
 def prepare_board():
@@ -124,61 +126,53 @@ def get_player_count(prompt):
             print("Invalid input: please enter a number.\n")
 
 
-def create_player_dict(num_players):
-    """Creates a dictionary of players with their bead and starting position."""
+def list_players(numbers):
+    """ makes dict of the players with beed and position 
+        numbers: int
+        returns: dict(name -> [beed,position]) """
 
-    def get_player_name(players, prompt):
-        """Prompts the user to enter a player name, and validates it."""
-
+    def check_player(players, text):
+        """ takes player name and checks whether it's in it
+            players: dict(name -> [beed,position])
+            text: text you want to show to screen """
         while True:
-            name = input(prompt).lower().strip()
+            name = input(text).lower().strip()
             if name not in players:
                 return name
             else:
-                print("That name is already taken. Please try another name.")
+                print(
+                    "That player already exist please try to use abbreviation or another name..\n")
 
     players = {}
-    rankings = ["first", "second", "third", "fourth"]
-    beads = ["@", "#", "%", "*"]
-    random.shuffle(beads)
-    for i in range(num_players):
-        player_name = get_player_name(
-            players, f"Enter {rankings[i]} player's name: ")
-        players[player_name] = [beads[i], 1]
-        print(f"Your bead is: {tc.colored(beads[i], 'blue', None, ['bold'])}")
+    ranking = ["first", "second", "third", "fourth"]
+    beeds = ["@", "#", "%", "*"]
+    random.shuffle(beeds)
+    for i in range(numbers):
+        temp_name = check_player(
+            players, "Enter %s player's name: " % (ranking[i]))
+        players[temp_name] = [beeds[i], 1]
+        print("Your beed is: %s :" %
+              (tc.colored(beeds[i], "blue", None, ["bold"])))
     return players
 
 
-def get_random_player_order(players):
-    """Randomly shuffle the order of players in a game.
-
-    Args:
-    players (dict): A dictionary with the names of players as keys and a list of
-        their bead and current position as values.
-
-    Returns:
-    list: A shuffled list of the player names.
-    """
+def random_chance(players):
+    """ creates random chances of the players
+        players: dict(name -> [beed,number])
+        returns: """
     random_players = list(players.keys()).copy()
     random.shuffle(random_players)
     return random_players
 
 
-def check_game_over(players):
-    """Check whether the game is over by checking if any player has reached the winning position.
-
-    Args:
-    players (dict): A dictionary with the names of players as keys and a list of
-        their bead and current position as values.
-
-    Returns:
-    tuple: A tuple containing a Boolean value and the name of the winning player,
-        if any. The Boolean value is True if the game is over and False otherwise.
-    """
-    for player_name, (bead, position) in players.items():
-        if position >= 100:
-            return (False, None)
-    return (True, player_name)
+def is_gameover(players):
+    """ checks whether game is over or not 
+        players: dict (name -> [beed,position])
+        returns: Boolean """
+    for i in players:
+        if players[i][1] >= 100:
+            return (False, i)
+    return (True, "")
 
 
 def dice(chance):
@@ -237,16 +231,15 @@ def play_game():
     # ask user how many players (must be less than <=4)
     numbers = get_player_count("\nHow many people want to play:")
     # make dict of players
-    players = create_player_dict(numbers)
-    print(players)
+    players = list_players(numbers)
     # assign different color to the beads
-    colors = assign_bead_colors(players)
+    colors = assign_color(players)
     # randomly assign the players chances
-    random_chances = get_random_player_order(players)
+    random_chances = random_chance(players)
     # counter to keep track of the chances
     counter = 0
     # while all the player position <= 100
-    while check_game_over(players)[0]:
+    while is_gameover(players)[0]:
         # show the board with the beeds
         display_board(players, prepare_board(), colors)
         # print whose chance is this and roll the dice
@@ -265,14 +258,14 @@ def play_game():
             dice(current_chance)
             # see whose chance is this, roll the dice and move the player's beed
             update_players(players, crrnt_plyr, current_chance)
-            if not (check_game_over(players)[0]):
+            if not (is_gameover(players)[0]):
                 display_board(players, prepare_board(), colors)
         else:
             print("Your chance is dismissed because you did'nt roll the dice !!")
         # increase the counter
         counter += 1
     print("\n\nCONGO, %s is the winner\n\n" % (tc.colored(
-        check_game_over(players)[1], "white", None, ["bold", "underline"])))
+        is_gameover(players)[1], "white", None, ["bold", "underline"])))
 
 
 play_game()
