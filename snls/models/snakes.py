@@ -51,7 +51,6 @@ def display_board(players, board, colors):
             beed_place[players[i][1]].append(players[i][0])
         else:
             beed_place[players[i][1]] = list(players[i][0])
-    print(f"pl:{players}")
     print("".center(111, "-"))
     for i in board:
         print("|", end="")
@@ -78,7 +77,6 @@ def display_board(players, board, colors):
             print("|", end="")
         print()
         print("".center(111, "-"))
-    print(f"bp:{beed_place}")
 
 
 def update_players(players, name, dice):
@@ -98,13 +96,14 @@ def update_players(players, name, dice):
 
     player_p = players[name][1]
     if is_snake(player_p + dice):
-        print("A snake ∫ is found on \"%d\" and it bites you ..." %
-              (is_snake(player_p + dice)[0]))
-        print("Went to %d.\n" % (is_snake(player_p + dice)[1]))
+        print(
+            f"A snake ∫ is found on \"{is_snake(player_p + dice)[0]}\" and you've been  bitten ...")
+        print(f"Went to {is_snake(player_p + dice)[1]}.\n")
         players[name][1] = is_snake(player_p + dice)[1]
     elif is_ladder(player_p + dice):
-        print("WooW!! a ladder is found...\nClimb it fast...")
-        print("Climbed up to \"%d\".\n" % (is_ladder(player_p + dice)[1]))
+        print("Wow! A ladder has been discovered... \nQuickly climb it!")
+        print(
+            f"Climbed up to \"{is_ladder(player_p + dice)[1]}\".\n")
         players[name][1] = is_ladder(player_p + dice)[1]
     elif players[name][1] + dice < 101:
         players[name][1] += dice
@@ -268,28 +267,28 @@ def play_game():
         # show the board with the beeds
         display_board(players, prepare_board(), colors)
         # print whose chance is this and roll the dice
-        crrnt_plyr = random_chances[counter % len(players)]
+        active_player = random_chances[counter % len(players)]
         # current player's beed
-        crrnt_plyr_beed = players[crrnt_plyr][0]
+        active_player_beed = players[active_player][0]
         # colored beed of the current player
-        crrnt_plyr_clr = tc.colored(
-            crrnt_plyr_beed, colors[crrnt_plyr_beed], None, ["bold"])
-        if input("It's %s's %s chance:\nroll the DICE: " % (crrnt_plyr.capitalize(), crrnt_plyr_clr)).lower().strip() == "roll".lower().strip():
+        colored_bead = tc.colored(
+            active_player_beed, colors[active_player_beed], None, ["bold"])
+        if input(f"It's {active_player.capitalize()}'s {colored_bead} chance:\nroll the DICE: ").lower().strip() == "r".lower().strip():
             current_chance = random.randrange(1, 7)
             print("\nROLLING ...\n")
-            print("It's a %s !." % (tc.colored(
-                current_chance, "blue", None, ["bold", "underline"])))
+            print(
+                f'It\'s a {tc.colored(current_chance, "blue", None, ["bold", "underline"])} !.')
             # show the dice image
             dice(current_chance)
             # see whose chance is this, roll the dice and move the player's beed
-            update_players(players, crrnt_plyr, current_chance)
+            update_players(players, active_player, current_chance)
             if not (check_game_over(players)[0]):
                 display_board(players, prepare_board(), colors)
         else:
             print("Your chance is dismissed because you did'nt roll the dice !!")
         # increase the counter
         counter += 1
-    print("\n\nCONGO, %s is the winner\n\n" % (tc.colored(
+    print("\n\nGAME OVER, {%s} is the winner\n\n".format(tc.colored(
         check_game_over(players)[1], "white", None, ["bold", "underline"])))
 
 
