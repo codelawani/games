@@ -18,7 +18,7 @@ def assign_bead_colors(players):
 
 
 def prepare_board():
-    """ make board in form of nested lists 
+    """ make board in form of nested lists
         returns: nested lists  """
 
     board = []
@@ -26,11 +26,10 @@ def prepare_board():
     for i in range(100, 0, -1):
         temp.append(str(i))
         if (i-1) % 10 == 0:
+            if len(board) % 2:
+                temp.reverse()
             board.append(temp)
             temp = []
-    for j in range(len(board)):
-        if j % 2:
-            board[j].reverse()
     return board
 
 
@@ -40,34 +39,36 @@ def display_board(players, board, colors):
         board: list of numbers(use prepare_board() function
         returns: None
         """
-    snakes_blocks = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
-    ladder_blocks = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
+    snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
+    ladders = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
 
     # creates a dictionary (position -> (beed)) list is used due possibility of many beeds at a position
+    # players:{'nico': ['*', 1], 'dav': ['#', 1]}
+    # beed_place:{1: ['*', '#']}
     beed_place = {}
     for i in players:
-        if beed_place.get(players[i][1]):
+        if players[i][1] in beed_place:
             beed_place[players[i][1]].append(players[i][0])
         else:
             beed_place[players[i][1]] = list(players[i][0])
-
+    print(f"pl:{players}")
     print("".center(111, "-"))
     for i in board:
         print("|", end="")
         for j in i:
-            if beed_place.get(int(j)):
+            if int(j) in beed_place:
                 print(j.rjust(6), end="")
-                for k in beed_place.get(int(j)):
+                for k in beed_place[int(j)]:
                     print(tc.colored(k, colors[k],
                           None, attrs=["bold"]), end="")
-                print("".ljust(4-len(beed_place.get(int(j)))), end="")
+                print("".ljust(4 - len(beed_place[int(j)])), end="")
             else:
-                if snakes_blocks.get(int(j)):
+                if int(j) in snakes:
                     print(j.rjust(6), end="")
                     print(tc.colored("∫", "white", None,
                           attrs=["blink", "bold"]), end="")
                     print(" "*3, end="")
-                elif ladder_blocks.get(int(j)):
+                elif int(j) in ladders:
                     print(j.rjust(6), end="")
                     print(tc.colored("†", "yellow", None,
                           attrs=["blink", "bold"]), end="")
@@ -77,6 +78,7 @@ def display_board(players, board, colors):
             print("|", end="")
         print()
         print("".center(111, "-"))
+    print(f"bp:{beed_place}")
 
 
 def update_players(players, name, dice):
@@ -85,14 +87,14 @@ def update_players(players, name, dice):
         dice: list
         returns: dict(name -> [beed,number]) """
     def is_snake(position):
-        snakes_blocks = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
-        if position in snakes_blocks:
-            return (position, snakes_blocks[position])
+        snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
+        if position in snakes:
+            return (position, snakes[position])
 
     def is_ladder(position):
-        ladder_blocks = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
-        if position in ladder_blocks:
-            return (position, ladder_blocks[position])
+        ladders = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
+        if position in ladders:
+            return (position, ladders[position])
 
     player_p = players[name][1]
     if is_snake(player_p + dice):
@@ -223,6 +225,22 @@ def dice(chance):
     print("".center(9, "-"), "\n")
 
 
+""" def dice(chance):
+    dots = {1: ["     ", "  *  ", "     "],
+            2: ["*    ", "     ", "    *"],
+            3: ["*    ", "  *  ", "    *"],
+            4: ["*   *", "     ", "*   *"],
+            5: ["*   *", "  *  ", "*   *"],
+            6: ["* * *", "     ", "* * *"]}
+
+    print("".center(9, "_"))
+    for i in range(3):
+        print("|", end="")
+        print(dots[chance][i].center(7), end="")
+        print("|")
+    print("".center(9, "-"), "\n") """
+
+
 def play_game():
 
     print("\n"+"WELCOME TO".center(50, "."), "\n")
@@ -275,4 +293,5 @@ def play_game():
         check_game_over(players)[1], "white", None, ["bold", "underline"])))
 
 
-play_game()
+if __name__ == '__main__':
+    play_game()
