@@ -3,9 +3,17 @@ import random
 
 
 def assign_bead_colors(players):
-    """Assigns different colors to each player's bead.
-        players: dictionary(name -> [bead,position])
-        returns: dictionary(bead -> color)"""
+    """
+    Assigns a unique color to each player's bead.
+
+    Args:
+        players (dict): A dictionary that maps player
+        names to a list of their bead and position.
+
+    Returns:
+        dict: A dictionary that maps each bead to a
+        unique color chosen from a list of predefined colors.
+    """
 
     colors = ["red", "green", "cyan", "magenta"]
     random.shuffle(colors)
@@ -16,8 +24,15 @@ def assign_bead_colors(players):
 
 
 def prepare_board():
-    """ make board in form of nested lists
-        returns: nested lists  """
+    """
+    Generates a game board as a nested list.
+
+    Returns:
+    - board: A nested list representing the game board.
+            The list contains 10 sub-lists, each with 10 elements.
+            The elements are string representations
+            of numbers from 100 to 1, arranged in a serpentine pattern.
+    """
 
     board = []
     temp = []
@@ -32,17 +47,25 @@ def prepare_board():
 
 
 def display_board(players, board, colors):
-    """ prints the board in a pretty manner
-        players: dictionary(name -> [bead,position])
-        board: list of numbers(use prepare_board() function
-        returns: None
-        """
+    """
+    Displays a game board with player positions, ladders, and snakes.
+
+    Args:
+    - players: A dictionary containing player names mapped
+                to a list of bead and position.
+                dictionary(name -> [bead,position])
+    - board: A list of list of numbers representing the game board.
+            Use the prepare_board() function to generate the board.
+    - colors: A dictionary containing bead mapped to colors.
+
+    Returns: None
+    """
+
     snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
     ladders = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
 
     # creates a dictionary (position -> (bead))
-    # list is used due possibility of many beads at a position
-
+    # list is used due to possibility of many beads at a position
     bead_place = {}
     for i in players:
         bead = players[i][0]
@@ -64,7 +87,7 @@ def display_board(players, board, colors):
             else:
                 if int(j) in snakes:
                     print(j.rjust(6), end="")
-                    cprint("∫", "white", None,
+                    cprint("∫", "white",
                            attrs=["blink", "bold"], end="")
                     print(" "*3, end="")
                 elif int(j) in ladders:
@@ -80,10 +103,21 @@ def display_board(players, board, colors):
 
 
 def update_players(players, name, dice):
-    """ updates the position of the the players
-        players: dict(name -> [bead,number])
-        dice: list
-        returns: dict(name -> [bead,number]) """
+    """
+    Updates the position of a player on the board, based on the dice roll.
+
+    Args:
+        players (dict): A dictionary containing player names mapped
+                        to a list of bead and position.
+                        dict(name -> [bead,number])
+        name (str): The name of the player to update.
+        dice (int): The number rolled on the dice.
+
+    Returns:
+        dict: A dictionary containing the updated positions of all players.
+                dict(name -> [bead,number])
+    """
+
     def is_snake(position):
         snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
         if position in snakes:
@@ -96,49 +130,91 @@ def update_players(players, name, dice):
 
     player_p = players[name][1]
     if is_snake(player_p + dice):
-        print(f"A snake ∫ is found on \"{is_snake(player_p + dice)[0]}\" and \
-              you've been  bitten ...")
-        print(f"Went to {is_snake(player_p + dice)[1]}.\n")
+        print(f"A snake ∫ is found on \"{is_snake(player_p + dice)[0]}\" and "
+              f"you've been  bitten ...")
+        print(f"Now you're at {is_snake(player_p + dice)[1]}.\n")
         players[name][1] = is_snake(player_p + dice)[1]
     elif is_ladder(player_p + dice):
-        print("Wow! A ladder has been discovered... \nQuickly climb it!")
+        print("Wow! You found a ladder... \nYou go all the way up")
         print(
-            f"Climbed up to \"{is_ladder(player_p + dice)[1]}\".\n")
+            f"Now you're at \"{is_ladder(player_p + dice)[1]}\".\n")
         players[name][1] = is_ladder(player_p + dice)[1]
     elif players[name][1] + dice < 101:
         players[name][1] += dice
 
 
 def get_player_count(prompt):
-    """Prompts the user to enter the number of players,
-        and validates the input."""
+    """
+    Prompts the user to enter the number of players and validates the input.
 
+    Args:
+        prompt (str): A string prompt to be displayed to the user.
+
+    Returns:
+        int or None: The number of players entered by the user,
+        or None if the user entered '0' to quit the game.
+
+    """
+
+    print("Enter a number between 1 and 4")
+    print("Only 4 players allowed at a time")
     while True:
         try:
+            cprint("Enter 0 to quit the game".center(
+                32), "red", attrs=["blink"])
             player_count = int(input(prompt))
             if player_count < 1:
-                print("Invalid input: number of players must be at least 1.\n")
+                return
             elif player_count > 4:
-                print("Sorry, we can't accommodate more than 4 players.\n")
+                cprint("Sorry, we can't accommodate more than 4 players.\n",
+                       "red")
             else:
                 return player_count
         except ValueError:
-            print("Invalid input: please enter a number.\n")
+            cprint("Invalid input: please enter a number.\n", "red")
 
 
 def create_player_dict(num_players):
-    """Creates a dictionary of players with their
-        bead and starting position."""
+    """
+    Creates a dictionary of players with their bead and starting position.
+
+    Args:
+        num_players (int): The number of players in the game.
+
+    Returns:
+        dict: A dictionary of player names mapped to a list
+        containing their bead symbol and starting position.
+
+    """
 
     def get_player_name(players, prompt):
-        """Prompts the user to enter a player name, and validates it."""
+        """
+        Prompts the user to enter a player name and validates it.
 
+        Args:
+            players (dict): A dictionary of player names mapped
+            to their bead symbol and starting position.
+            prompt (str): A string prompt to be displayed to the user.
+
+        Returns:
+            str or None: The player's name entered by the user,
+            or None if the user entered '0' or 'q' to quit the game.
+
+        """
+        cprint("Enter 0 or q to quit the game".center(32),
+               "red", attrs=["blink"])
         while True:
             name = input(prompt).lower().strip()
-            if name not in players:
+            print(name)
+            if name in ("0", "q"):
+                return
+            elif not name:
+                print("Please enter a name")
+            elif name not in players:
                 return name
             else:
                 print("That name is already taken. Please try another name.")
+    print()
 
     players = {}
     rankings = ["first", "second", "third", "fourth"]
@@ -147,6 +223,8 @@ def create_player_dict(num_players):
     for i in range(num_players):
         player_name = get_player_name(
             players, f"Enter {rankings[i]} player's name: ")
+        if not player_name:
+            return
         players[player_name] = [beads[i], 1]
         print(f"Your bead is: {colored(beads[i], 'blue', None, ['bold'])}")
     return players
@@ -221,8 +299,16 @@ def dice(chance):
     print("".center(9, "-"), "\n")
 
 
-def play_game():
+def display_quit_msg():
+    """Displays quit message
+    """
+    cprint(" You quit!!! ".center(50, "="), "red", attrs=["bold"])
+    cprint("GAME OVER! Come back next time :)".center(50),
+           "black", attrs=["bold"])
 
+
+def play_game():
+    """Game engine that runs the game"""
     print("\n"+"WELCOME TO".center(50, "."), "\n")
     print(r"""        /\		     |-----|
        //\\                  |-----|
@@ -233,9 +319,15 @@ def play_game():
      \/	                     |-----|
     """)
     # ask user how many players (must be less than <=4)
-    numbers = get_player_count("\nHow many people want to play:")
+    numbers = get_player_count("\nHow many people want to play: ")
+    if not numbers:
+        display_quit_msg()
+        exit()
     # make dict of players
     players = create_player_dict(numbers)
+    if not players:
+        display_quit_msg()
+        exit()
     # assign different color to the beads
     colors = assign_bead_colors(players)
     # randomly assign the players chances
@@ -254,12 +346,17 @@ def play_game():
         colorBead = colored(
             active_player_bead, colors[active_player_bead], None, ["bold"])
         player = active_player.capitalize()
-        print("To roll the dice, Type r and click Enter")
-        print("To quit the game, Type q and click Enter")
+        print("To roll the dice, Type r/roll and click Enter")
+        cprint("To quit the game, Type q/quit and click Enter",
+               "red", attrs=["blink"])
+        print("Hint: r gets the dice rolling :)")
+        pos = players[active_player][1]
+        display_pos = f"Your bead {colorBead} is currently at position {pos}"
 
-        prompt = f"It's {player}'s {colorBead} chance:\nroll the DICE: "
+        prompt = (f"It's {player}'s {colorBead} chance: {display_pos}\n"
+                  f"roll the DICE: ")
         player_input = input(prompt).lower().strip()
-        if player_input == "r":
+        if player_input in ["r", "roll"]:
             current_chance = random.randrange(1, 7)
             print("\nROLLING ...\n")
             colored_chance = colored(current_chance, "blue", None, [
@@ -272,10 +369,9 @@ def play_game():
             update_players(players, active_player, current_chance)
             if not (check_game_over(players)[0]):
                 display_board(players, prepare_board(), colors)
-        elif player_input == "q":
-            cprint(" You quit!!! ".center(50, "="), "red", attrs=["bold"])
-            cprint("GAME OVER! Come back next time :)".center(50),
-                   "black", attrs=["bold"])
+
+        elif player_input in ["q", "quit"]:
+            display_quit_msg()
             exit()
         else:
             print("You missed ur chance because you did'nt roll the dice !!")
@@ -289,5 +385,5 @@ if __name__ == '__main__':
     try:
         play_game()
     except (EOFError, KeyboardInterrupt):
-        print("\nGame ended")
+        display_quit_msg()
         exit()
