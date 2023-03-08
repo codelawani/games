@@ -1,13 +1,11 @@
-import termcolor as tc
+from termcolor import colored, cprint
 import random
-import colorama
-colorama.init()
 
 
 def assign_bead_colors(players):
     """Assigns different colors to each player's bead.
-        players: dictionary(name -> [beed,position])
-        returns: dictionary(beed -> color)"""
+        players: dictionary(name -> [bead,position])
+        returns: dictionary(bead -> color)"""
 
     colors = ["red", "green", "cyan", "magenta"]
     random.shuffle(colors)
@@ -35,42 +33,44 @@ def prepare_board():
 
 def display_board(players, board, colors):
     """ prints the board in a pretty manner
-        players: dictionary(name -> [beed,position])
+        players: dictionary(name -> [bead,position])
         board: list of numbers(use prepare_board() function
         returns: None
         """
     snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
     ladders = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
 
-    # creates a dictionary (position -> (beed)) list is used due possibility of many beeds at a position
-    # players:{'nico': ['*', 1], 'dav': ['#', 1]}
-    # beed_place:{1: ['*', '#']}
-    beed_place = {}
+    # creates a dictionary (position -> (bead))
+    # list is used due possibility of many beads at a position
+
+    bead_place = {}
     for i in players:
-        if players[i][1] in beed_place:
-            beed_place[players[i][1]].append(players[i][0])
+        bead = players[i][0]
+        position = players[i][1]
+        if position in bead_place:
+            bead_place[position].append(bead)
         else:
-            beed_place[players[i][1]] = list(players[i][0])
+            bead_place[position] = list(bead)
     print("".center(111, "-"))
     for i in board:
         print("|", end="")
         for j in i:
-            if int(j) in beed_place:
+            if int(j) in bead_place:
                 print(j.rjust(6), end="")
-                for k in beed_place[int(j)]:
-                    print(tc.colored(k, colors[k],
-                          None, attrs=["bold"]), end="")
-                print("".ljust(4 - len(beed_place[int(j)])), end="")
+                for k in bead_place[int(j)]:
+                    cprint(k, colors[k],
+                           None, attrs=["bold"], end="")
+                print("".ljust(4 - len(bead_place[int(j)])), end="")
             else:
                 if int(j) in snakes:
                     print(j.rjust(6), end="")
-                    print(tc.colored("∫", "white", None,
-                          attrs=["blink", "bold"]), end="")
+                    cprint("∫", "white", None,
+                           attrs=["blink", "bold"], end="")
                     print(" "*3, end="")
                 elif int(j) in ladders:
                     print(j.rjust(6), end="")
-                    print(tc.colored("†", "yellow", None,
-                          attrs=["blink", "bold"]), end="")
+                    cprint("†", "yellow", None,
+                           attrs=["blink", "bold"], end="")
                     print(" "*3, end="")
                 else:
                     print(j.center(10), end="")
@@ -81,9 +81,9 @@ def display_board(players, board, colors):
 
 def update_players(players, name, dice):
     """ updates the position of the the players
-        players: dict(name -> [beed,number])
+        players: dict(name -> [bead,number])
         dice: list
-        returns: dict(name -> [beed,number]) """
+        returns: dict(name -> [bead,number]) """
     def is_snake(position):
         snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
         if position in snakes:
@@ -96,8 +96,8 @@ def update_players(players, name, dice):
 
     player_p = players[name][1]
     if is_snake(player_p + dice):
-        print(
-            f"A snake ∫ is found on \"{is_snake(player_p + dice)[0]}\" and you've been  bitten ...")
+        print(f"A snake ∫ is found on \"{is_snake(player_p + dice)[0]}\" and \
+              you've been  bitten ...")
         print(f"Went to {is_snake(player_p + dice)[1]}.\n")
         players[name][1] = is_snake(player_p + dice)[1]
     elif is_ladder(player_p + dice):
@@ -110,7 +110,8 @@ def update_players(players, name, dice):
 
 
 def get_player_count(prompt):
-    """Prompts the user to enter the number of players, and validates the input."""
+    """Prompts the user to enter the number of players,
+        and validates the input."""
 
     while True:
         try:
@@ -126,7 +127,8 @@ def get_player_count(prompt):
 
 
 def create_player_dict(num_players):
-    """Creates a dictionary of players with their bead and starting position."""
+    """Creates a dictionary of players with their
+        bead and starting position."""
 
     def get_player_name(players, prompt):
         """Prompts the user to enter a player name, and validates it."""
@@ -146,7 +148,7 @@ def create_player_dict(num_players):
         player_name = get_player_name(
             players, f"Enter {rankings[i]} player's name: ")
         players[player_name] = [beads[i], 1]
-        print(f"Your bead is: {tc.colored(beads[i], 'blue', None, ['bold'])}")
+        print(f"Your bead is: {colored(beads[i], 'blue', None, ['bold'])}")
     return players
 
 
@@ -154,7 +156,8 @@ def get_random_player_order(players):
     """Randomly shuffle the order of players in a game.
 
     Args:
-    players (dict): A dictionary with the names of players as keys and a list of
+    players (dict): A dictionary with the names
+        of players as keys and a list of
         their bead and current position as values.
 
     Returns:
@@ -166,15 +169,19 @@ def get_random_player_order(players):
 
 
 def check_game_over(players):
-    """Check whether the game is over by checking if any player has reached the winning position.
+    """Check whether the game is over by checking if
+        any player has reached the winning position.
 
     Args:
-    players (dict): A dictionary with the names of players as keys and a list of
+    players (dict): A dictionary with the names
+        of players as keys and a list of
         their bead and current position as values.
 
     Returns:
-    tuple: A tuple containing a Boolean value and the name of the winning player,
-        if any. The Boolean value is True if the game is over and False otherwise.
+    tuple: A tuple containing a Boolean value and
+        the name of the winning player, if any.
+        The Boolean value is True
+        if the game is over and False otherwise.
     """
     for player_name, (bead, position) in players.items():
         if position >= 100:
@@ -183,61 +190,35 @@ def check_game_over(players):
 
 
 def dice(chance):
-    print("".center(9, "_"))
+    """
+    This function takes an integer value 'chance' as input and
+    prints a graphical representation of a dice with 'chance'
+    number of dots on its face. The output is printed in the
+    terminal using the `cprint` function from the `termcolor` library.
 
-    print("|", end="")
-    if chance == 4 or chance == 6 or chance == 5:
-        print(tc.colored("*   *".center(7), "yellow",
-              None, attrs=["bold"]), end="")
-    elif chance == 2:
-        print(tc.colored("*".center(7), "yellow",
-              None, attrs=["bold"]), end="")
-    elif chance == 3:
-        print(tc.colored("*".rjust(7), "yellow", None, attrs=["bold"]), end="")
-    elif chance == 1:
-        print("".rjust(7), end="")
-    print("|")
+    Parameters:
+    ----------
+    chance: int
+        The number of dots to display on the face of the dice.
+        This value must be an integer between 1 and 6 (inclusive).
 
-    print("|", end="")
-    if chance == 4 or chance == 6:
-        print(tc.colored("*   *".center(7), "yellow",
-              None, attrs=["bold"]), end="")
-    elif chance == 3 or chance == 5:
-        print(tc.colored("*".center(7), "yellow",
-              None, attrs=["bold"]), end="")
-    elif chance == 2 or chance == 1:
-        print(tc.colored("*".center(7), "yellow", None, ["bold"]), end="")
-    print("|")
-
-    if chance != 4 and chance != 2:
-        print("|", end="")
-        if chance == 5 or chance == 6:
-            print(tc.colored("*   *".center(7), "yellow",
-                  None, attrs=["bold"]), end="")
-        elif chance == 1:
-            print("".center(7), end="")
-        elif chance == 3:
-            print(tc.colored("*".ljust(7), "yellow",
-                  None, attrs=["bold"]), end="")
-        print("|")
-
-    print("".center(9, "-"), "\n")
-
-
-""" def dice(chance):
+    Returns:
+    -------
+    None
+    """
     dots = {1: ["     ", "  *  ", "     "],
             2: ["*    ", "     ", "    *"],
             3: ["*    ", "  *  ", "    *"],
             4: ["*   *", "     ", "*   *"],
             5: ["*   *", "  *  ", "*   *"],
-            6: ["* * *", "     ", "* * *"]}
+            6: ["*   *", "*   *", "*   *"]}
 
     print("".center(9, "_"))
     for i in range(3):
         print("|", end="")
-        print(dots[chance][i].center(7), end="")
+        cprint(dots[chance][i].center(7), "yellow", attrs=["bold"], end="")
         print("|")
-    print("".center(9, "-"), "\n") """
+    print("".center(9, "-"), "\n")
 
 
 def play_game():
@@ -255,7 +236,6 @@ def play_game():
     numbers = get_player_count("\nHow many people want to play:")
     # make dict of players
     players = create_player_dict(numbers)
-    print(players)
     # assign different color to the beads
     colors = assign_bead_colors(players)
     # randomly assign the players chances
@@ -264,33 +244,50 @@ def play_game():
     counter = 0
     # while all the player position <= 100
     while check_game_over(players)[0]:
-        # show the board with the beeds
+        # show the board with the beads
         display_board(players, prepare_board(), colors)
         # print whose chance is this and roll the dice
         active_player = random_chances[counter % len(players)]
-        # current player's beed
-        active_player_beed = players[active_player][0]
-        # colored beed of the current player
-        colored_bead = tc.colored(
-            active_player_beed, colors[active_player_beed], None, ["bold"])
-        if input(f"It's {active_player.capitalize()}'s {colored_bead} chance:\nroll the DICE: ").lower().strip() == "r".lower().strip():
+        # current player's bead
+        active_player_bead = players[active_player][0]
+        # colored bead of the current player
+        colorBead = colored(
+            active_player_bead, colors[active_player_bead], None, ["bold"])
+        player = active_player.capitalize()
+        print("To roll the dice, Type r and click Enter")
+        print("To quit the game, Type q and click Enter")
+
+        prompt = f"It's {player}'s {colorBead} chance:\nroll the DICE: "
+        player_input = input(prompt).lower().strip()
+        if player_input == "r":
             current_chance = random.randrange(1, 7)
             print("\nROLLING ...\n")
-            print(
-                f'It\'s a {tc.colored(current_chance, "blue", None, ["bold", "underline"])} !.')
+            colored_chance = colored(current_chance, "blue", None, [
+                                     "bold", "underline"])
+            print(f'It\'s a {colored_chance} !.')
             # show the dice image
             dice(current_chance)
-            # see whose chance is this, roll the dice and move the player's beed
+            # see whose chance is this, roll the dice
+            # and move the player's bead
             update_players(players, active_player, current_chance)
             if not (check_game_over(players)[0]):
                 display_board(players, prepare_board(), colors)
+        elif player_input == "q":
+            cprint(" You quit!!! ".center(50, "="), "red", attrs=["bold"])
+            cprint("GAME OVER! Come back next time :)".center(50),
+                   "black", attrs=["bold"])
+            exit()
         else:
-            print("Your chance is dismissed because you did'nt roll the dice !!")
+            print("You missed ur chance because you did'nt roll the dice !!")
         # increase the counter
         counter += 1
-    print("\n\nGAME OVER, {%s} is the winner\n\n".format(tc.colored(
+    print("\n\nGAME OVER, {%s} is the winner\n\n".format(colored(
         check_game_over(players)[1], "white", None, ["bold", "underline"])))
 
 
 if __name__ == '__main__':
-    play_game()
+    try:
+        play_game()
+    except (EOFError, KeyboardInterrupt):
+        print("\nGame ended")
+        exit()
