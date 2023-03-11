@@ -1,5 +1,7 @@
 from typing import Literal
-from textual.containers import Vertical, Horizontal, Container
+from textual.containers import (
+	Vertical, Horizontal
+)
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static
 from textual.widget import Widget
@@ -77,7 +79,7 @@ def humanize_coords(coords: tuple[int, int]) -> str:
 
 
 
-class Cell(Container):
+class Cell(Widget):
 	"""a cell on a chessboard"""
 
 	def __init__(self, coords: tuple[int, int],
@@ -90,10 +92,14 @@ class Cell(Container):
 	def on_click(self):
 		if self.has_class("selected"):
 			self.remove_class("selected")
-		else:
-			for cell in self.app.query(Cell):
-				cell.remove_class("selected")
-			self.add_class("selected")
+			return
+		piece = self.query_one(Piece)
+		if piece.is_empty:
+			self.app.bell()
+			return
+		for cell in self.app.query(Cell):
+			cell.remove_class("selected")
+		self.add_class("selected")
 
 class Piece(Static):
 	"""a chess piece"""
@@ -101,8 +107,8 @@ class Piece(Static):
 	def __init__(self, symbol, color, name):
 		self.piece_name = name
 		self.piece_color = color
+		self.is_empty = not symbol.strip()
 		super().__init__(symbol, classes=color)
-
 
 class PieceInfo(Static):
 	"""shows you the selected piece"""
@@ -132,22 +138,17 @@ class ChessApp(App):
 
 	def compose(self) -> ComposeResult:
 		style = cycle(("light", "dark"))
-		rows: list[Horizontal] = []
-		for r in range(8):
-			cells: list[Cell] = []
-			for c in range(8):
-				cell = Cell((r,c), next(style))
-				cells.append(cell)
-			rows.append(Horizontal(
-				*cells, id=f"board-row{r}",
-				classes="board-row"
-			))
-			next(style)
-		board = Vertical(*rows, id="board")
-		
 		yield Header()
-		yield Vertical(*rows)
-		yield board
+		with Horizontal(id="main"):
+			yield LeftIndicators()
+			with Vertical(id="board"):
+				for r in range(8):
+					with Horizontal(id=f"board-row{r}", classes="board-row"):
+						for c in range(8):
+							yield Cell((r,c), next(style))
+					next(style)
+				yield BottomIndicators()
+		yield Footer()
 
 if __name__ == "__main__":
 	app = ChessApp()
