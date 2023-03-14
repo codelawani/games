@@ -1,0 +1,24 @@
+How to Play Snake and Ladder
+Welcome to the game of Snake and Ladder!
+In this game, your objective is to reach the end of the board by rolling a dice and moving forward.
+
+--The Board--
+The game board is a grid of squares, numbered from 1 to 100.
+Some squares have ladders on them, which allow you to climb up the board and skip ahead several spaces.
+Other squares have snakes on them, which force you to slide down the board and lose progress.
+
+--Gameplay--
+To start playing, each player chooses a token and places it on the starting square.
+Players take turns rolling the dice and moving their token forward the number of spaces indicated by the dice roll.
+
+If you land on a ladder space, you get to climb up the board to a higher space.
+If you land on a snake space, you have to slide down the board to a lower space.
+
+If you land on the last square of the board, you win the game!
+
+--Tips and Strategies--
+Try to land on ladder spaces as often as possible to skip ahead on the board.
+Avoid landing on snake spaces, as they will send you back down the board.
+
+--Conclusion--
+Thank you for reading this help page! We hope you have fun playing Snake and Ladder.
