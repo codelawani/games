@@ -61,7 +61,7 @@ def display_board(players, board, colors):
     Returns: None
     """
 
-    snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
+    snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 40}
     ladders = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
 
     # creates a dictionary (position -> (bead))
@@ -119,7 +119,7 @@ def update_players(players, name, dice):
     """
 
     def is_snake(position):
-        snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 9}
+        snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 40}
         if position in snakes:
             return (position, snakes[position])
 
