@@ -1,7 +1,12 @@
-from termcolor import colored, cprint
 import random
 import sys
 import pydoc
+try:
+    from termcolor import colored, cprint
+except (ModuleNotFoundError):
+    print("You need To install termcolor, Enter:\n\
+          pip install termcolor")
+    exit()
 
 HELP = """
 Welcome to the game of Snake and Ladder!
@@ -199,6 +204,8 @@ def get_player_count(prompt):
             player_count = input(prompt)
             if player_count == 'q':
                 return
+            if int(player_count) < 1:
+                cprint("Enter a number between 1 and 4.", "red")
             elif int(player_count) > 4:
                 cprint("Sorry, we can't accommodate more than 4 players.\n",
                        "red")
