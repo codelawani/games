@@ -18,7 +18,7 @@ This game requires the following modules to be installed:
 ---
 To start the game, navigate to the directory where the game files are stored in your command line interface and run the following command:
 
-```python game.py```
+```python3 game.py```
 
 This will start the game and display the game board in your command line interface.
 
