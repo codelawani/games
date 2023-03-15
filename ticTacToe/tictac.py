@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import random
 
+
 def display_board(board):
     print(" {} | {} | {} ".format(*board[:3]))
     print("---+---+---")
@@ -9,14 +10,17 @@ def display_board(board):
     print(" {} | {} | {} ".format(*board[6:9]))
     print()
 
+
 def player_move(board, player, position):
     board[position] = player
     return board
 
+
 def get_player_move(board, player):
     while True:
         try:
-            position = int(input(f"Player {player}, make your move (1-9): ")) - 1
+            position = int(
+                input(f"Player {player}, make your move (1-9): ")) - 1
             if position < 0 or position > 8:
                 raise ValueError
             if board[position] != " ":
@@ -26,11 +30,13 @@ def get_player_move(board, player):
         except ValueError:
             print("Invalid input. Please enter a number between 1 and 9.")
 
+
 def get_computer_move(board, computer):
     print(f"Computer ({computer}), is making its move...")
     possible_moves = [i for i in range(9) if board[i] == " "]
     move = random.choice(possible_moves)
     return move
+
 
 def check_win(board, player):
     win_conditions = [
@@ -43,8 +49,10 @@ def check_win(board, player):
             return True
     return False
 
+
 def check_draw(board):
     return all(cell != " " for cell in board)
+
 
 def get_game_mode():
     while True:
@@ -54,6 +62,7 @@ def get_game_mode():
             continue
         return mode.lower()
 
+
 def get_player_symbols():
     while True:
         player1 = input("Player 1, select your symbol (X or O): ")
@@ -62,6 +71,7 @@ def get_player_symbols():
             continue
         player2 = "X" if player1.lower() == "o" else "O"
         return player1.upper(), player2
+
 
 def run_game():
     mode = get_game_mode()
@@ -86,6 +96,7 @@ def run_game():
             print("It's a draw!")
             break
         current_player = player2_symbol if current_player == player1_symbol else player1_symbol
+
 
 if __name__ == '__main__':
     run_game()
