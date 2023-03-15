@@ -34,20 +34,20 @@ class TicTacToe:
 
         # Create game board
         self.board_frame = tk.Frame(
-            root, highlightbackground="blue")
+            root, background="blue", )
 
         self.board_frame.pack()
 
         self.board_buttons = []
         for i in range(9):
             button = tk.Button(self.board_frame, text="", width=6, height=3, font=("Helvetica", 20),
-                               command=lambda i=i: self.make_move(i))
+                               background="#0f0e17", fg="#fffffe", activebackground="#ff8906", highlightbackground="#a7a9be", command=lambda i=i: self.make_move(i))
             button.grid(row=i//3, column=i % 3)
             self.board_buttons.append(button)
 
         # Create reset button
         self.reset_button = tk.Button(
-            root, text="Reset", width=10, command=self.reset_game)
+            root, text="Restart", width=10, background="#f25f4c", activebackground="#e53170", command=self.reset_game)
         self.reset_button.pack(pady=10)
 
     def make_move(self, position):
