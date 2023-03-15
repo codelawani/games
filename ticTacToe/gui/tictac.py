@@ -18,6 +18,13 @@ Have fun!
 
 class TicTacToe:
     def __init__(self, root):
+        """
+        Initialize the TicTacToe game with a blank board and X as the starting player.
+
+        Args:
+        - root (Tk): The root window for the game.
+        """
+
         self.root = root
         self.root.title("Tic Tac Toe")
 
@@ -45,6 +52,15 @@ class TicTacToe:
         self.reset_button.pack(pady=10)
 
     def make_move(self, position):
+        """
+        Updates the game board and checks for a win or draw when a move is made.
+
+        Args:
+        - position (int): The position of the move made.
+
+        Returns:
+        None
+        """
         if not self.game_over and self.board[position] == " ":
             self.board[position] = self.current_player
             self.board_buttons[position].config(text=self.current_player)
@@ -58,6 +74,15 @@ class TicTacToe:
             self.current_player = "O" if self.current_player == "X" else "X"
 
     def check_win(self, player):
+        """
+        Checks if the specified player has won the game.
+
+        Args:
+        - player (str): The player to check for a win.
+
+        Returns:
+        - bool: True if the player has won, False otherwise.
+        """
         win_conditions = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Horizontal wins
             [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Vertical wins
@@ -69,9 +94,21 @@ class TicTacToe:
         return False
 
     def check_draw(self):
+        """
+        Checks if the game has ended in a draw.
+
+        Returns:
+        - bool: True if the game has ended in a draw, False otherwise.
+        """
         return all(cell != " " for cell in self.board)
 
     def reset_game(self):
+        """
+        Resets the game board to a blank state.
+
+        Returns:
+        None
+        """
         self.board = [" "]*9
         for button in self.board_buttons:
             button.config(text="")
@@ -80,6 +117,8 @@ class TicTacToe:
 
 
 if __name__ == '__main__':
+    # sys.argv[1:] generates an empty list
+    # if no arguments are passed
     if sys.argv[1:] and sys.argv[1] in ("-h", "help"):
         print(HELP)
         exit(0)
