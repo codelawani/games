@@ -35,7 +35,7 @@ class CustomMessageBox(tk.Toplevel):
         label.pack(padx=10, pady=10)
 
         # Add a button to close the window
-        button = tk.Button(self, text="OK", background="#f25f4c", activebackground="#e53170", width=10, command=self.destroy,
+        button = tk.Button(self, text="OK", background="#ff8906", activebackground="black", activeforeground="#ff8906", width=10, command=self.destroy,
                            relief='flat', borderwidth=0)
         button.pack(padx=10, pady=10)
 
@@ -104,7 +104,7 @@ class TicTacToe:
             elif self.check_draw():
                 # Create a new custom message box
                 message_box = CustomMessageBox("Tic Tac Toe", "It's a draw!",
-                                               bg_color="#0f0e17", fg_color="#ff8906")
+                                               bg_color="#0f0e17", fg_color="white")
                 # Make the message box modal
                 message_box.grab_set()
                 message_box.focus_set()
