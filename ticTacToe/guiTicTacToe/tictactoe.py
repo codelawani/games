@@ -15,6 +15,31 @@ Have fun!
 """
 
 
+class CustomMessageBox(tk.Toplevel):
+    def __init__(self, title, message, bg_color, fg_color):
+        super().__init__()
+
+        # Set the window title
+        self.title_bg_color = "#f25f4c"
+        self.title(" " * 20)
+        self.title(title)
+        self.configure(background='#a7a9be')
+
+        # Create a frame to hold the message text
+        frame = tk.Frame(self, bg=bg_color)
+        frame.pack(padx=10, pady=10)
+
+        # Create a label to display the message text
+        label = tk.Label(frame, text=message, bg=bg_color, fg=fg_color,
+                         font=('Arial', 24))
+        label.pack(padx=10, pady=10)
+
+        # Add a button to close the window
+        button = tk.Button(self, text="OK", background="#f25f4c", activebackground="#e53170", width=10, command=self.destroy,
+                           relief='flat', borderwidth=0)
+        button.pack(padx=10, pady=10)
+
+
 class TicTacToe:
     def __init__(self, root):
         """
@@ -26,7 +51,7 @@ class TicTacToe:
 
         self.root = root
         self.root.title("Tic Tac Toe")
-
+        self.root.configure(background='#a7a9be')
         # Initialize game state
         self.board = [" "]*9
         self.current_player = "X"
@@ -64,11 +89,30 @@ class TicTacToe:
             self.board[position] = self.current_player
             self.board_buttons[position].config(text=self.current_player)
             if self.check_win(self.current_player):
-                messagebox.showinfo(
-                    "Tic Tac Toe", f"Player {self.current_player} wins!")
+                # Create a new custom message box
+                message_box = CustomMessageBox("Tic Tac Toe", f"Player {self.current_player} wins!",
+                                               bg_color="#0f0e17", fg_color="#ff8906")
+                # Make the message box modal
+                message_box.grab_set()
+                message_box.focus_set()
+
+                # Wait for the message box to close
+                message_box.wait_window()
+
+                # Set the game over flag
                 self.game_over = True
             elif self.check_draw():
-                messagebox.showinfo("Tic Tac Toe", "It's a draw!")
+                # Create a new custom message box
+                message_box = CustomMessageBox("Tic Tac Toe", "It's a draw!",
+                                               bg_color="#0f0e17", fg_color="#ff8906")
+                # Make the message box modal
+                message_box.grab_set()
+                message_box.focus_set()
+
+                # Wait for the message box to close
+                message_box.wait_window()
+
+                # Set the game over flag
                 self.game_over = True
             self.current_player = "O" if self.current_player == "X" else "X"
 
