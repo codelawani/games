@@ -1,6 +1,19 @@
 #!/usr/bin/python3
 import tkinter as tk
 from tkinter import messagebox
+import pydoc
+import sys
+
+HELP = """
+Welcome to Tic Tac Toe!
+
+To play, simply click on any cell on the board to place your symbol (X or O).
+The first player to get three in a row (horizontal, vertical, or diagonal) wins the game.
+
+To reset the game, click the "Reset" button.
+
+Have fun!
+"""
 
 
 class TicTacToe:
@@ -67,6 +80,9 @@ class TicTacToe:
 
 
 if __name__ == '__main__':
+    if sys.argv[1:] and sys.argv[1] in ("-h", "help"):
+        print(HELP)
+        exit(0)
     root = tk.Tk()
     TicTacToe(root)
     root.mainloop()
