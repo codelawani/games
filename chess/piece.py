@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Literal, NamedTuple, Optional, Type
 
 if TYPE_CHECKING:
@@ -47,8 +47,10 @@ class notations:
 	) 
 
 	@classmethod
-	def get_symbol(cls, id: int,
-		variant: SymbolVariant="filled") -> str:
+	def get_symbol(
+		cls, id: int,
+		variant: SymbolVariant="filled"
+	) -> str:
 		"""
 		get a chess piece symbol.
 
@@ -83,18 +85,22 @@ class notations:
 		return ''
 
 	@classmethod
-	def get_char(cls, id: int) -> str:
+	def get_char(cls, id: int, epd_mode: bool = False) -> str:
 		"""
 		get the character used to represent a chess piece in a EPD string.
 
 		Args:
 			id: the ID of the chess piece
+			epd_mode: if True then it'll return an uppercase or
+				lowecase character based of the color of the piece.
 		Return:
 			A chess piece's EPD character or an empty string if
 			ID isn't associated with a chess piece.
 		"""
 		for piece in cls.pieces:
 			if piece.id == abs(id):
+				if epd_mode and id > 0:
+					return piece.char.upper()
 				return piece.char
 		return ''
 
@@ -123,24 +129,23 @@ class notations:
 
 		Args:
 			name_or_char: the chess piece's name or EPD character.
+			epd_mode: if True then it'll return a negative or positive
+				id based of the color of the piece
 		Return:
 			the ID of a chess pice or 0 if the piece doesn't exist
 		"""
-		upper = name_or_char.isupper()
-		name_or_char = name_or_char.strip().lower()
+		name_or_char = name_or_char.strip()
 		if not name_or_char:
 			return 0
 		if len(name_or_char) == 1:
 			for piece in cls.pieces:
-				if piece.char == name_or_char:
-					_id = piece.id
-					return (
-						_id * (-1) if epd_mode and not upper
-						else _id
-					)
+				if piece.char == name_or_char.lower():
+					if epd_mode and name_or_char.islower():
+						return piece.id * -1
+					return piece.id
 		else:
 			for piece in cls.pieces:
-				if piece.name == name_or_char:
+				if piece.name == name_or_char.lower():
 					return piece.id
 		return 0
 

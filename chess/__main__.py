@@ -1,8 +1,8 @@
-from chess import Chess
+from .chess import Chess
 import sys
 import pydoc
 
-from epd import get_EPD
+from .epd import get_EPD
 
 WELCOME = '''
 ****************************

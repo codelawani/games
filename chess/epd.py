@@ -1,17 +1,31 @@
 """
-This module contains functions that help to work EPD hashes.
+Extended Position Description
 
 An Extended Position Description (EPD) is a format for representing
 the state of a chess board. It depicts which player's turn it is,
-the availability of castling and en passant moves, and more
+the availability of castling and en passant moves, and more.
 
 
-def load_epd(epd_string): create a 8x8 board from an EPD string.
+EPD Representation Of Pieces
+----------------------------
+[+] black pawn:   id = -1, char = p
+[+] black knight: id = -2, char = n
+[+] black bishop: id = -3, char = b
+[+] black rook:   id = -4, char = r
+[+] black queen:  id = -5, char = q
+[+] black king:   id = -6, char = k
+
+[+] white pawn:   id = 1, char = P
+[+] white knight: id = 2, char = N
+[+] white bishop: id = 3, char = B
+[+] white rook:   id = 4, char = R
+[+] white queen:  id = 5, char = Q
+[+] white king:   id = 6, char = K
 """
-from curses.ascii import isupper
+
 from dataclasses import dataclass, field
 from typing import Literal, NewType, Optional
-from piece import (
+from .piece import (
 	notations
 )
 

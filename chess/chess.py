@@ -6,10 +6,10 @@ from rich import box
 from rich.panel import Panel
 from rich import print as rprint
 from textual.reactive import reactive
-from epd import CoordT, get_EPD, get_coords, load_EPD, Game, EPDString, switch_p_move
+from .epd import CoordT, get_EPD, get_coords, load_EPD, Game, EPDString, switch_p_move
 from itertools import cycle
 
-from piece import notations
+from .piece import notations
 
 
 EPD = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -"
