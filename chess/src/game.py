@@ -5,6 +5,7 @@ This module contains a base class that holds the game's state.
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, Optional
+from typing_extensions import Self
 
 import json
 from pathlib import Path
@@ -19,16 +20,13 @@ if TYPE_CHECKING:
 
 DIR = Path(__file__).parent.joinpath("data")
 DIR.mkdir(exist_ok=True)
+FILE = DIR.joinpath("game.json")
+FILE.touch()
 
 
 def create_board() -> list[list[int]]:
 	"""Create a chess board."""
 	return [[0 for x in range(8)] for y in range(8)]
-
-
-def get_game_name() -> str:
-	"""Get the game's name."""
-	return datetime.now().strftime("Game_%Y-%m-%d_%H-%M-%S")
 
 
 @dataclass
@@ -121,11 +119,6 @@ class Game:
 
 	last_move: Optional[Move] = None
 
-	_file: Path = field(
-		default_factory=lambda: DIR.joinpath(f"{get_game_name()}.json"),
-		init=False, repr=False, compare=False
-	)
-	
 	def switch_player(self):
 		"""Switch player's color."""
 		self.player *= -1
@@ -161,7 +154,6 @@ class Game:
 			return False
 		load_EPD(self, self.last_move.epd)
 		self.last_move = self.last_move.next
-		self.switch_player()
 		return True
 
 	def log_move(
@@ -207,14 +199,11 @@ class Game:
 		return {
 			"initial_pos": self.initial_pos,
 			"players": self.players,
-			"castling": self.castling,
-			"en_passant": self.en_passant,
 			"epd_hash": self.epd_hash,
 			"epd": get_EPD(self),
 			"log": self.log,
 			"last_move": self.last_move.serialize() if self.last_move else None
 		}
-
 
 	@classmethod
 	def deserialize(cls, data: dict) -> Game:
@@ -226,22 +215,21 @@ class Game:
 		Returns:
 			Game: The deserialized game.
 		"""
-		return cls(
-			initial_pos=data["epd"],
-			players=data["players"],
-			epd_hash=data["epd_hash"],
-			log=data["log"],
-			last_move=Move.deserialize(data["last_move"]) if data["last_move"] else None
-		)
-
+		new = cls(data['epd'])
+		print(f"player: {new.player}")
+		new.players = data["players"]
+		new.log = data['log']
+		new.last_move = Move.deserialize(data["last_move"]) if data["last_move"] else None
+		
+		return new
 
 	def save(self):
 		"""Save the game to a file."""
-		with open(self._file, "w") as f:
+		with FILE.open("w") as f:
 			json.dump(self.serialize(), f)
 
 	@classmethod
-	def load(cls, file: Path) -> Game:
+	def load(cls, file: Path) -> Self:
 		"""Load a game from a file."""
 		with open(file, "r") as f:
 			return cls.deserialize(json.load(f))

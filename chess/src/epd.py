@@ -141,12 +141,16 @@ def load_EPD(game: Game, epd_string: EPDString) -> bool:
 	if len(data) != 4:
 		return False
 	for r, row in enumerate(data[0].split("/")):
-		for c, piece in enumerate(row):
+		c = 0
+		for piece in row:
 			if piece.isdigit():
 				for i in range(int(piece)):
 					game.board[r][c] = 0
+					c += 1
 			else:
 				game.board[r][c] = notations.get_id(piece, True)
+				c += 1
+	print(f"Player: {data[1]}")
 	game.player = 1 if data[1] == "w" else -1
 	# castling
 	for i, row in enumerate("KQkq"):
@@ -181,7 +185,7 @@ def get_EPD(game: Game) -> EPDString:
 			result += str(empty)
 		rows.append(result)
 	epd_string += "/".join(rows)
-	if game.player == -1:
+	if game.player == 1:
 		epd_string += " w "
 	else:
 		epd_string += " b "

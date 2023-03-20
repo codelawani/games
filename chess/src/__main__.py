@@ -1,8 +1,8 @@
 from .chess import Chess
 import sys
 import pydoc
-from rich.prompt import Prompt
-
+from rich.prompt import Prompt, Confirm
+from .game import FILE
 from .epd import get_EPD
 
 WELCOME = '''
@@ -110,12 +110,27 @@ if len(sys.argv) > 1 and sys.argv[1].strip() in ("--help", "-h", "help"):
 	sys.exit(0);
 
 print(WELCOME)
-chess_game = Chess()
 
-# get players names
-p1 = Prompt.ask('Player 1, what is your name', default=chess_game.players[0])
-p2 = Prompt.ask('Player 2, what is your name', default=chess_game.players[1])
-chess_game.players = [p1, p2]
+def get_player_names(game: Chess):
+	"""Get the names for the chess players."""
+	p1 = Prompt.ask('Player 1, what is your name', default=game.players[0])
+	p2 = Prompt.ask('Player 2, what is your name', default=game.players[1])
+	game.players = [p1, p2]
+
+
+if len(FILE.read_bytes()) > 5:
+	should_load = Confirm.ask("A saved game was found, do you want to continue it",
+							  default=True)
+	if should_load:
+		chess_game = Chess.load(FILE)
+	else:
+		FILE.write_text('')
+		chess_game = Chess()
+		get_player_names(chess_game)
+else:
+	chess_game = Chess()
+	get_player_names(chess_game)
+
 
 while True:
 	if chess_game.player == 1:
@@ -138,29 +153,29 @@ while True:
 		if chess_game.move(cur_pos, next_pos) == False:
 			print('Invalid move')
 			valid = False
-		else:
+		if valid:
 			chess_game.switch_player()
-		state = chess_game.is_end()
-		if state == [0, 0, 0]:
-			if chess_game.check_state(get_EPD(chess_game)) == "PP":
-				print(chess_game.pawn_promotion())
-		if sum(state) > 0:
-			print("\n*********************\n      GAME OVER\n*********************\n")
-			chess_game.display()
-			print("Game Log:\n---------\n")
-			print(f'INITIAL POSITION = {chess_game.initial_pos}')
-			print(f'MOVES = {chess_game.log}')
-			print('\nGame Result:\n------------\n')
-			if state == [0, 0, 1]:
-					print('BLACK WINS')
-			elif state == [1, 0, 0]:
-					print('WHITE WINS')
-			else:
-					print('TIE GAME')
-			break
+			state = chess_game.is_end()
+			if state == [0, 0, 0]:
+				if chess_game.check_state(get_EPD(chess_game)) == "PP":
+					print(chess_game.pawn_promotion())
+			if sum(state) > 0:
+				print("\n*********************\n      GAME OVER\n*********************\n")
+				chess_game.display()
+				print("Game Log:\n---------\n")
+				print(f'INITIAL POSITION = {chess_game.initial_pos}')
+				print(f'MOVES = {chess_game.log}')
+				print('\nGame Result:\n------------\n')
+				if state == [0, 0, 1]:
+						print('BLACK WINS')
+				elif state == [1, 0, 0]:
+						print('WHITE WINS')
+				else:
+						print('TIE GAME')
+				break
 	elif choice == '2':
 		if chess_game.undo_move():
-			chess_game.display()
+			pass
 		else:
 			print('No moves to undo')
 	elif choice == '3':
@@ -168,13 +183,6 @@ while True:
 		print('Game Log:\n---------\n')
 		print(f'INITIAL POSITION = {chess_game.initial_pos}')
 		print(f'MOVES = {chess_game.log}')
-		print('\nGame Result:\n------------\n')
-		if state == [0, 0, 1]:
-			print('BLACK WINS')
-		elif state == [1, 0, 0]:
-			print('WHITE WINS')
-		else:
-			print('TIE GAME')
 	elif choice == '4':
 		chess_game.save()
 		break
