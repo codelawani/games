@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Extended Position Description
 
@@ -23,11 +24,42 @@ EPD Representation Of Pieces
 [+] white king:   id = 6, char = K
 """
 
+"""
+Extended Position Description (EPD) Format
+------------------------------------------
+The EPD format is a string that describes the state of a chess board.
+It is composed of four parts, separated by spaces:
+
+1. The board position, in Forsyth-Edwards Notation (FEN) format.
+2. The active color. "w" means white moves next, "b" means black.
+3. Castling availability. If neither side can castle, this is "-".
+   Otherwise, this has one or more letters:
+   - "K" (white can castle kingside)
+   - "Q" (white can castle queenside)
+   - "k" (black can castle kingside)
+   - "q" (black can castle queenside)
+4. En passant target square in algebraic notation. If there's no en passant
+   target square, this is "-". If a pawn has just made a two-square move,
+   this is the position "behind" the pawn. This is recorded regardless of
+   whether there is a pawn in position to make an en passant capture.
+5. Halfmove clock: This is the number of halfmoves since the last capture
+   or pawn advance. This is used to determine if a draw can be claimed under
+   the fifty-move rule.
+6. Fullmove number: The number of the full move. It starts at 1, and is
+   incremented after black's move.
+
+Example:
+	rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+"""
+
 from dataclasses import dataclass, field
-from typing import Literal, NewType, Optional
+from typing import TYPE_CHECKING, Literal, NewType, Optional
 from .piece import (
 	notations
 )
+
+if TYPE_CHECKING:
+	from .game import Game
 
 
 EPDString = NewType("EPDString", str)
@@ -44,33 +76,6 @@ BoardT = list[list[int]]
 def switch_p_move(p_move: Literal[-1, 1]) -> Literal[-1, 1]:
 	"""Switch active player"""
 	return p_move * (-1)
-
-@dataclass
-class Game:
-	"""
-	represents the state of a chess game
-	"""
-	initial_pos: EPDString
-	"game initial position"
-
-	board: list[list[int]] = field(default_factory=
-		lambda: [[0 for x in range(8)] for y in range(8)])
-	"8x8 chess board"
-
-	p_move: Literal[1, -1] = 1
-	"current player move. black(-1), white(1)"
-
-	castling: list[int] = field(default_factory=lambda: [1, 1, 1, 1])
-	"castling control"
-
-	en_passant: Optional[CoordT] = None
-	"En passant control"
-
-	epd_hash: dict[EPDString, int] = field(default_factory=dict)
-	"A table that keeps track of all EPD hashes of the game"
-
-	log: list[str] = field(default_factory=list)
-	"chess game logs"
 
 
 def get_coords(loc: str) -> Optional[CoordT]:
@@ -135,33 +140,17 @@ def load_EPD(game: Game, epd_string: EPDString) -> bool:
 	data = epd_string.split(" ")
 	if len(data) != 4:
 		return False
-	for x, rank in enumerate(data[0].split("/")):
-		y = 0
-		for p in rank:
-			if p.isdigit():
-				for i in range(int(p)):
-					game.board[x][y] = 0
-					y += 1
+	for r, row in enumerate(data[0].split("/")):
+		for c, piece in enumerate(row):
+			if piece.isdigit():
+				for i in range(int(piece)):
+					game.board[r][c] = 0
 			else:
-				game.board[x][y] = notations.get_id(p, True)
-				y += 1
-	game.p_move = 1 if data[1] == "w" else -1
-	if "K" in data[2]:
-		game.castling[0] = 1
-	else:
-		game.castling[0] = 0
-	if "Q" in data[2]:
-		game.castling[1] = 1
-	else:
-		game.castling[1] = 0
-	if "k" in data[2]:
-		game.castling[2] = 1
-	else:
-		game.castling[2] = 0
-	if "q" in data[2]:
-		game.castling[3] = 1
-	else:
-		game.castling[3] = 0
+				game.board[r][c] = notations.get_id(piece, True)
+	game.player = 1 if data[1] == "w" else -1
+	# castling
+	for i, row in enumerate("KQkq"):
+		game.castling[i] = int(row in data[2])
 	game.en_passant = (
 		None if data[3] == "-" else get_coords(data[3])
 	)
@@ -175,41 +164,38 @@ def get_EPD(game: Game) -> EPDString:
 	Returns:
 		str: The EPD hash string representing the current state of the chess board.
 	"""
-	result = ""
-	for i, row in enumerate(game.board):
-		e_count = 0
+	rows: 'list[str]' = []
+	epd_string = ""
+	for r, row in enumerate(game.board):
+		result = ""
+		empty = 0
 		for piece in row:
 			if piece == 0:
-				e_count += 1
+				empty += 1
 			else:
-				if e_count > 0:
-					result += str(e_count)
-				e_count = 0
-				p_notation = notations.get_char(piece)
-				result += p_notation if piece < 0 else p_notation.upper()
-		if e_count > 0:
-			result += str(e_count)
-		if i < 7:
-			result += "/"
-	if game.p_move == -1:
-		result += " w"
+				if empty > 0:
+					result += str(empty)
+				empty = 0
+				result += notations.get_char(piece, True)
+		if empty > 0:
+			result += str(empty)
+		rows.append(result)
+	epd_string += "/".join(rows)
+	if game.player == -1:
+		epd_string += " w "
 	else:
-		result += " b"
-	result += " "
+		epd_string += " b "
 	if sum(game.castling) == 0:
-		result += "-"
+		epd_string += "-"
 	else:
-		if game.castling[0] == 1:
-			result += "K"
-		if game.castling[1] == 1:
-			result += "Q"
-		if game.castling[2] == 1:
-			result += "k"
-		if game.castling[3] == 1:
-			result += "q"
-	result += " "
+		epd_string += "".join((
+			"K" if game.castling[0] == 1 else "",
+			"Q" if game.castling[1] == 1 else "",
+			"k" if game.castling[2] == 1 else "",
+			"q" if game.castling[3] == 1 else ""
+		))
 	if game.en_passant == None:
-		result += "-"
+		epd_string += " -"
 	else:
-		result += get_loc(game.en_passant)
-	return EPDString(result)
+		epd_string += " " + get_loc(game.en_passant)
+	return EPDString(epd_string)

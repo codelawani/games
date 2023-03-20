@@ -105,7 +105,7 @@ class notations:
 		return ''
 
 	@classmethod
-	def get_class(cls, id: int) -> Optional[Type[Piece]]:
+	def get_class(cls, id: int) -> Type[Piece]:
 		"""
 		get the logical implementation for a piece on the chessboard.
 
@@ -117,10 +117,11 @@ class notations:
 		"""
 		name = cls.get_name(id)
 		if not name:
-			return None
+			return None # type: ignore
 		for subclass in Piece.__subclasses__():
 			if subclass.__name__.lower() == name.lower():
 				return subclass
+		return None # type: ignore
 
 	@classmethod
 	def get_id(cls, name_or_char: str, epd_mode: bool=False) -> int:
@@ -260,8 +261,8 @@ class King(Piece):
 			and game.board[pos[1]][pos[0] + 1] == 0
 			and game.board[pos[1]][pos[0] + 2] == 0
 			and (
-				(game.castling[0] == 1 and game.p_move == 1)
-				or (game.castling[2] == 1 and game.p_move == -1)
+				(game.castling[0] == 1 and game.player == 1)
+				or (game.castling[2] == 1 and game.player == -1)
 			)
 		):
 			result.append((pos[0] + 2, pos[1]))
@@ -270,8 +271,8 @@ class King(Piece):
 			and game.board[pos[1]][pos[0] - 1] == 0
 			and game.board[pos[1]][pos[0] - 2] == 0
 			and (
-				(game.castling[1] == 1 and game.p_move == 1)
-				or (game.castling[3] == 1 and game.p_move == -1)
+				(game.castling[1] == 1 and game.player == 1)
+				or (game.castling[3] == 1 and game.player == -1)
 			)
 		):
 			result.append((pos[0] - 2, pos[1]))

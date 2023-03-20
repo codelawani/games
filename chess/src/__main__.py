@@ -1,6 +1,7 @@
 from .chess import Chess
 import sys
 import pydoc
+from rich.prompt import Prompt
 
 from .epd import get_EPD
 
@@ -27,25 +28,25 @@ _____________
 
 This is how a board looks
 
-   a   b   c   d   e   f   g   h
-   +---+---+---+---+---+---+---+---+
+	a   b   c   d   e   f   g   h
+	+---+---+---+---+---+---+---+---+
 8  | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |  8
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 7  | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |  7
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 6  |   |   |   |   |   |   |   |   |  6
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 5  |   |   |   |   |   |   |   |   |  5
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 4  |   |   |   |   |   |   |   |   |  4
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 3  |   |   |   |   |   |   |   |   |  3
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 2  | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |  2
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 1  | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |  1
-   +---+---+---+---+---+---+---+---+
-     a   b   c   d   e   f   g   h
+	+---+---+---+---+---+---+---+---+
+	  a   b   c   d   e   f   g   h
 
 
 
@@ -74,25 +75,25 @@ _____________________________________________________________________
 
 Imagine you had a board like this...
 
-     a   b   c   d   e   f   g   h
-   +---+---+---+---+---+---+---+---+
+	  a   b   c   d   e   f   g   h
+	+---+---+---+---+---+---+---+---+
 8  | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |  8
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 7  | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |  7
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 6  |   |   |   |   |   |   |   |   |  6
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 5  |   |   |   |   |   |   |   |   |  5
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 4  |   |   |   |   |   |   |   |   |  4
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 3  |   |   |   |   |   |   |   |   |  3
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 2  | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |  2
-   +---+---+---+---+---+---+---+---+
+	+---+---+---+---+---+---+---+---+
 1  | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |  1
-   +---+---+---+---+---+---+---+---+
-     a   b   c   d   e   f   g   h
+	+---+---+---+---+---+---+---+---+
+	  a   b   c   d   e   f   g   h
 
 
 To move pieces on this board, you will need to use the standard chess notation for coordinates. The vertical columns are labeled from a to h, and the horizontal rows are labeled from 1 to 8.
@@ -105,42 +106,75 @@ It is important to always indicate both the starting and ending squares when mov
 '''
 
 if len(sys.argv) > 1 and sys.argv[1].strip() in ("--help", "-h", "help"):
-    pydoc.pager(WELCOME + '\n' + HELP)
-    sys.exit(0);
+	pydoc.pager(WELCOME + '\n' + HELP)
+	sys.exit(0);
 
 print(WELCOME)
 chess_game = Chess()
+
+# get players names
+p1 = Prompt.ask('Player 1, what is your name', default=chess_game.players[0])
+p2 = Prompt.ask('Player 2, what is your name', default=chess_game.players[1])
+chess_game.players = [p1, p2]
+
 while True:
-    if chess_game.p_move == 1:
-        print("\nIt's White's turn (UPPERCASE)\n")
-    else:
-        print("\nIt's Black's Turn (lowercase)\n")
-    chess_game.display()
-    if (chess_game.p_move == 1) or (chess_game.p_move == -1):
-        cur = input('What piece do you want to move?\n')
-        next = input('Where do you want to move the piece to?\n')
-    valid = False
-    if chess_game.move(cur, next) == False:
-        print('Invalid move')
-    else:
-        valid = True
-    state = chess_game.is_end()
-    if state == [0, 0, 0]:
-        if chess_game.check_state(get_EPD(chess_game)) == 'PP':
-            print(chess_game.pawn_promotion())
-    if sum(state) > 0:
-        print('\n*********************\n      GAME OVER\n*********************\n')
-        chess_game.display()
-        print('Game Log:\n---------\n')
-        print(f'INITIAL POSITION = {chess_game.initial_pos}')
-        print(f'MOVES = {chess_game.log}')
-        print('\nGame Result:\n------------\n')
-        if state == [0, 0, 1]:
-            print('BLACK WINS')
-        elif state == [1, 0, 0]:
-            print('WHITE WINS')
-        else:
-            print('TIE GAME')
-        break
-    if valid == True:
-        chess_game.p_move = chess_game.p_move * (-1)
+	if chess_game.player == 1:
+		print(f"\n{chess_game.players[0]} it's your turn\n")
+	else:
+		print(f"\n{chess_game.players[1]} it's your turn\n")
+	chess_game.display()
+	print("What would you like to do?\n")
+	print("1. Move a piece")
+	print("2. Undo last move")
+	print("3. Display game log")
+	print("4. Save and exit game")
+
+	choice = Prompt.ask('Enter your choice', default='1', choices=['1', '2', '3', '4'])
+
+	if choice == '1':
+		cur_pos = Prompt.ask('What piece do you want to move?')
+		next_pos = Prompt.ask('Where do you want to move the piece to?')
+		valid = True
+		if chess_game.move(cur_pos, next_pos) == False:
+			print('Invalid move')
+			valid = False
+		else:
+			chess_game.switch_player()
+		state = chess_game.is_end()
+		if state == [0, 0, 0]:
+			if chess_game.check_state(get_EPD(chess_game)) == "PP":
+				print(chess_game.pawn_promotion())
+		if sum(state) > 0:
+			print("\n*********************\n      GAME OVER\n*********************\n")
+			chess_game.display()
+			print("Game Log:\n---------\n")
+			print(f'INITIAL POSITION = {chess_game.initial_pos}')
+			print(f'MOVES = {chess_game.log}')
+			print('\nGame Result:\n------------\n')
+			if state == [0, 0, 1]:
+					print('BLACK WINS')
+			elif state == [1, 0, 0]:
+					print('WHITE WINS')
+			else:
+					print('TIE GAME')
+			break
+	elif choice == '2':
+		if chess_game.undo_move():
+			chess_game.display()
+		else:
+			print('No moves to undo')
+	elif choice == '3':
+		state = chess_game.is_end()
+		print('Game Log:\n---------\n')
+		print(f'INITIAL POSITION = {chess_game.initial_pos}')
+		print(f'MOVES = {chess_game.log}')
+		print('\nGame Result:\n------------\n')
+		if state == [0, 0, 1]:
+			print('BLACK WINS')
+		elif state == [1, 0, 0]:
+			print('WHITE WINS')
+		else:
+			print('TIE GAME')
+	elif choice == '4':
+		chess_game.save()
+		break
