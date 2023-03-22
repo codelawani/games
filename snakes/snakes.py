@@ -4,7 +4,7 @@ import pydoc
 try:
     from termcolor import colored, cprint
 except (ModuleNotFoundError):
-    print("You need To install termcolor, Enter:\n\
+    print("You need To install termcolor, To install, Enter:\n\
           pip install termcolor")
     exit()
 
@@ -156,7 +156,7 @@ def update_players(players, name, dice):
     """
 
     def is_snake(position):
-        snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69, 94: 16, 99: 40}
+        snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69}
         if position in snakes:
             return (position, snakes[position])
 
@@ -167,19 +167,25 @@ def update_players(players, name, dice):
 
     player_p = players[name][1]
     currentPos = player_p + dice
+    display_name = name.capitalize()
+    bluename = colored(display_name, "blue", attrs=["bold"])
+    redname = colored(display_name, "red", attrs=["bold"])
+    greenName = colored(display_name, "green", attrs=["bold"])
     if is_snake(player_p + dice):
-        print(f"A snake ∫ is found on \"{is_snake(currentPos)[0]}\" and "
-              f"you've been  bitten ...")
-        print(f"Now you're at {is_snake(player_p + dice)[1]}.\n")
+        print(f"A snake ∫ is found on \"{is_snake(currentPos)[0]}\"\n"
+              f"RIP :( you've been  bitten, hope it wasn't a python :) ...")
+        print(f"{redname} you're now at {is_snake(player_p + dice)[1]}.\n")
         players[name][1] = is_snake(player_p + dice)[1]
     elif is_ladder(player_p + dice):
         print("Wow! You found a ladder... \n Let's gooo!!")
         print(
-            f"Now you're at \"{is_ladder(currentPos)[1]}\".\n")
+            f"{greenName} you're now at \"{is_ladder(currentPos)[1]}\".\n")
         players[name][1] = is_ladder(player_p + dice)[1]
-    elif players[name][1] + dice < 101:
+    else:
         players[name][1] += dice
-        print(f"You {name} have moved to \"{currentPos}\".\n")
+        if players[name][1] > 100:
+            players[name][1] = 100
+        print(f"{bluename} has now moved to \"{players[name][1]}\".\n")
 
 
 def get_player_count(prompt):
@@ -304,7 +310,7 @@ def check_game_over(players):
     """
     for player_name, (bead, position) in players.items():
         if position >= 100:
-            return (False, None)
+            return (False, player_name)
     return (True, player_name)
 
 
@@ -343,7 +349,8 @@ def dice(chance):
 def display_quit_msg():
     """Displays quit message
     """
-    cprint(" You quit!!! ".center(50, "="), "red", attrs=["bold"])
+    print("")
+    cprint("You quit!!! ".center(50, "="), "red", attrs=["bold"])
     cprint("GAME OVER! Come back next time :)".center(50),
            "black", attrs=["bold"])
 
@@ -419,8 +426,15 @@ def play_game():
 
         # increase the counter
         counter += 1
-    print("\n\nGAME OVER, {%s} is the winner\n\n".format(colored(
-        check_game_over(players)[1], "white", None, ["bold", "underline"])))
+    # print the winner
+    winner = check_game_over(players)[1]
+    print("\n")
+    win_msg = f"Congratulations {winner.capitalize()}! You won the game!".center(
+        50, " ")
+    cprint(
+        win_msg, "green", attrs=["bold"])
+    print("\n")
+    return 0
 
 
 if __name__ == '__main__':
