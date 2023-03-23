@@ -12,9 +12,7 @@ from itertools import cycle
 from .piece import notations
 
 
-EPD = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -"
-EPD = EPDString(EPD)
-
+EPD = EPDString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -")
 
 class Chess(Game):
     """
