@@ -1,3 +1,54 @@
+"""
+This module contains the settings of the game.
+
+Colors:
+    GREEN: Color of the green player.
+    RED: Color of the red player.
+    YELLOW: Color of the yellow player.
+    BLUE: Color of the blue player.
+
+Board:
+    SQUARE_SIZE: Size of the square.
+    PANEL_WIDTH: Width of the panel.
+    PANEL_HEIGHT: Height of the panel.
+    BOARD_WIDTH: Width of the board.
+    BOARD_HEIGHT: Height of the board.
+    POINTS: List of the points.
+    POSITIVE_V: List of the positive vertical squares.
+    POSITIVE_H: List of the positive horizontal squares.
+
+Player:
+    PLAYER_WIDTH: Width of the player.
+    PLAYER_HEIGHT: Height of the player.
+    PLAYER_RADIUS: Radius of the player.
+    PLAYER_COLOR: Color of the player.
+    PLAYER_OUTLINE: Outline of the player.
+    PLAYER_OUTLINE_WIDTH: Width of the outline of the player.
+    PLAYER_OUTLINE_COLOR: Color of the outline of the player.
+    PLAYER_TEXT_COLOR: Color of the text of the player.
+    PLAYER_TEXT_SIZE: Size of the text of the player.
+    PLAYER_TEXT_FONT: Font of the text of the player.
+    PLAYER_TEXT_OFFSET: Offset of the text of the player.
+
+Text
+"""
+import logging
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s %(message)s',
+    datefmt='%m/%d/%Y %I:%M:%S %p',
+)
+
+logger = logging.getLogger("ludo")
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(
+    "ludo.log",
+    mode='a'
+)
+handler.setLevel(logging.DEBUG)
+logger.addHandler(handler)
+
+
 class Color:
     """This class contains the colors used in the game."""
 
@@ -33,20 +84,23 @@ class Text:
 class Path:
     """This class contains the path of the game."""
 
+    gx = None
+    gy = None
+    ry = None
+    by = None
+    count = None
+
     def __init__(self):
         """This method initializes the path of the game."""
         self.green_path = []
         self.red_path = []
         self.blue_path = []
         self.yellow_path = []
-        self.gx = None
-        self.gy = None
-        self.ry = None
-        self.by = None
-        self.count = None
 
     def update_coordinates(self, gx, gy, ry, by, count):
-        """This method updates the coordinates of the path."""
+        """
+        This method updates the coordinates of the path.
+        """
         self.gx = gx
         self.gy = gy
         self.ry = ry
@@ -126,12 +180,12 @@ class Path:
         """This method populates the path of the game in any direction."""
         if direction == 'right':
             self.direct_horizontal(1, pow_index=pow_index)
+        elif direction == 'up':
+            self.direct_vertical(1, pow_index=pow_index)
         elif direction == 'left':
             self.direct_horizontal(-1, pow_index=pow_index)
         elif direction == 'down':
             self.direct_vertical(-1, pow_index=pow_index)
-        else:
-            self.direct_vertical(1, pow_index=pow_index)
 
 
 path = Path()

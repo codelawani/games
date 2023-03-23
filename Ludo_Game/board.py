@@ -1,8 +1,13 @@
+""""""
+
 import tkinter as tk
 from random import randrange
 from tkinter import font
 
-from settings import *
+from settings import (
+    Path, Board, Text, Color,
+    path
+)
 
 
 class LudoBoard:
