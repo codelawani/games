@@ -65,6 +65,15 @@ class LudoBoard:
         )
 
     def draw_circle(self, x1, y1, x2, y2, color):
+        """
+        This method draws a circle on the board.
+        Args:
+            x1 (int): x coordinate of the first point
+            y1 (int): y coordinate of the first point
+            x2 (int): x coordinate of the second point
+            y2 (int): y coordinate of the second point
+            color (str): color of the circle
+        """
         self.canvas.create_oval(
             x1 * Board.SQUARE_SIZE,
             y1 * Board.SQUARE_SIZE,
