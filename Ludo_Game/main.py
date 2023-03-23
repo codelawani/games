@@ -10,8 +10,19 @@ from board import *
 
 
 class Coin:
+    """Coin class"""
 
     def __init__(self, master, x, y, color, path_list, flag):
+        """
+        Initialises coin class
+        Args:
+            master: canvas
+            x: x coordinate
+            y: y coordinate
+            color: color of coin
+            path_list: path list
+            flag: flag
+        """
         self.canvas = master
         self.curr_x = x
         self.curr_y = y
@@ -31,6 +42,12 @@ class Coin:
         self.pad_x = 0
 
     def moveCoin(self, event):
+        """
+        Moves coin
+        Args:
+            event: event
+
+        """
 
         if self.disable:
             return
@@ -110,21 +127,37 @@ class Coin:
             self.next_turn()
 
     def congratulations(self):
+        """
+        Congratulates player
+        """
         Dice.update_state()
         Dice.set(self.flag - 1)
 
         return True
 
     def change_state(self, flag):
+        """
+        Changes state
+        Args:
+            flag: flag
+        """
         if flag == self.flag:
             self.disable = False
         else:
             self.disable = True
 
     def is_at_home(self):
+        """
+        Checks if coin is at home
+        Returns: True if coin is at home else False
+        """
         return self.curr_x == self.home_x and self.curr_y == self.home_y
 
     def check_home(self):
+        """
+        Checks if coin is at home
+        Returns: True if coin is at home else False
+        """
         count = 0
         for goti in colors[self.flag]:
             if goti.is_at_home():
@@ -133,6 +166,10 @@ class Coin:
         return count
 
     def is_player_won(self):
+        """
+        Checks if player has won
+        Returns: True if player has won else False
+        """
         reached = 0
         for goti in colors[self.flag]:
             if goti.win:
@@ -141,6 +178,10 @@ class Coin:
         return reached is 4
 
     def is_gameover(self):
+        """
+        Checks if game is over
+        Returns: True if game is over else False
+        """
         color_reached = 0
 
         for i in range(4):
@@ -159,6 +200,12 @@ class Coin:
         return True
 
     def can_attack(self, idx):
+        """
+        Checks if coin can attack
+        Args:
+            idx: index
+        Returns: True if coin can attack else False
+        """
         max_pad = 0
         count_a = 0
         x = self.path_list[idx][0]
@@ -191,16 +238,27 @@ class Coin:
         return (False, 0, 0)
 
     def goto_home(self):
+        """
+        Moves coin to home
+        """
         self.canvas.coords(self.img, self.home_x, self.home_y)
         self.curr_x = self.home_x
         self.curr_y = self.home_y
         self.curr_index = -1
 
     def next_turn(self):
+        """
+        Changes turn
+        """
         if len(Dice.roll) == 0:
             Dice.set(self.flag)
 
     def set_playername(self, player):
+        """
+        Sets player name
+        Args:
+            player: player name
+        """
         self.player = player
 
 
@@ -212,6 +270,10 @@ class Dice:
 
     @classmethod
     def rolling(cls):
+        """
+        Rolls dice
+
+        """
         temp = choice(range(1, 9))
         if temp > 6:
             temp = 6
@@ -241,6 +303,9 @@ class Dice:
 
     @classmethod
     def start(cls):
+        """
+        Starts game
+        """
         Dice.rolling()
         if cls.roll.count(6) >= 3:
             if [cls.roll[-1], cls.roll[-2], cls.roll[-3]] == [6, 6, 6]:
@@ -254,6 +319,9 @@ class Dice:
 
     @classmethod
     def update_panel(cls):
+        """
+        Updates panel
+        """
         root.update()
         sleep(0.5)
         Dice.set(cls.chance)
@@ -261,6 +329,9 @@ class Dice:
 
     @classmethod
     def set(cls, flag):
+        """
+        Sets dice
+        """
         flag += 1
         cls.chance = flag
         if flag == 4:
@@ -288,18 +359,32 @@ class Dice:
 
     @classmethod
     def remove(cls):
+        """
+        Removes dice
+        """
         Dice.roll.pop(0)
 
     @classmethod
     def remove_by_index(cls, ex):
+        """
+        Removes dice by index
+        Args:
+            ex: index
+        """
         del cls.roll[cls.roll.index(ex)]
 
     @classmethod
     def update_state(cls):
+        """
+        Updates state
+        """
         cls.append_state = True
 
     @classmethod
     def check_move_possibility(cls):
+        """
+        Checks move possibility
+        """
         check_1 = 0
         check_2 = 0
         for goti in colors[cls.chance]:
@@ -319,6 +404,15 @@ class Dice:
 
 
 def align(x, y, color, path_list, flag):
+    """
+    Aligns coins
+    Args:
+        x: x coordinate
+        y: y coordinate
+        color: color
+        path_list: path list
+        flag: flag
+    """
     container = []
     for i in range(2):
         test = Coin(ludo.get_canvas(), x, y + i*2*Board.SQUARE_SIZE,
@@ -333,6 +427,9 @@ def align(x, y, color, path_list, flag):
 
 
 def startgame():
+    """
+    Starts game
+    """
     for i in range(4):
         if players[i].get():
             turn[i] = players[i].get()
@@ -386,12 +483,15 @@ def create_enterpage():
 
 
 def on_closing():
+    """Close the game.
+    """
     if tkinter.messagebox.askokcancel("Quit", "Do you want to quit the game? If you want to continue the game, press Enter in the Nickname window"):
         top.destroy()
         root.destroy()
 
 
 def on_closingroot():
+    """Close the game."""
     if tkinter.messagebox.askokcancel("Quit", "Do you want to quit the game?"):
         root.destroy()
 
