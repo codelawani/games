@@ -150,7 +150,6 @@ def load_EPD(game: Game, epd_string: EPDString) -> bool:
 			else:
 				game.board[r][c] = notations.get_id(piece, True)
 				c += 1
-	print(f"Player: {data[1]}")
 	game.player = 1 if data[1] == "w" else -1
 	# castling
 	for i, row in enumerate("KQkq"):
@@ -185,21 +184,12 @@ def get_EPD(game: Game) -> EPDString:
 			result += str(empty)
 		rows.append(result)
 	epd_string += "/".join(rows)
-	if game.player == 1:
-		epd_string += " w "
-	else:
-		epd_string += " b "
-	if sum(game.castling) == 0:
-		epd_string += "-"
-	else:
-		epd_string += "".join((
-			"K" if game.castling[0] == 1 else "",
-			"Q" if game.castling[1] == 1 else "",
-			"k" if game.castling[2] == 1 else "",
-			"q" if game.castling[3] == 1 else ""
-		))
-	if game.en_passant == None:
-		epd_string += " -"
-	else:
-		epd_string += " " + get_loc(game.en_passant)
+	epd_string += f" {'b' if game.player == 1 else 'b'} "
+	epd_string += "".join((
+		"K" if game.castling[0] == 1 else "",
+		"Q" if game.castling[1] == 1 else "",
+		"k" if game.castling[2] == 1 else "",
+		"q" if game.castling[3] == 1 else ""
+	)) or "-"
+	epd_string += f" {'-' if game.en_passant == None else get_loc(game.en_passant)}"
 	return EPDString(epd_string)
