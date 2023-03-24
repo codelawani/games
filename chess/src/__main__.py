@@ -148,9 +148,9 @@ while True:
 
 	if choice == '1':
 		cur_pos = Prompt.ask('What piece do you want to move?')
-		next_pos = Prompt.ask('Where do you want to move the piece to?')
+		next_loc = Prompt.ask('Where do you want to move the piece to?')
 		valid = True
-		if chess_game.move(cur_pos, next_pos) == False:
+		if chess_game.move(cur_pos, next_loc) == False:
 			print('Invalid move')
 			valid = False
 		if valid:

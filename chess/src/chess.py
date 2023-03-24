@@ -85,29 +85,27 @@ class Chess(Game):
         rprint(Panel.fit(board))
 
 
-    def move(self, curr_pos, next_pos):
+    def move(self, curr_loc: str, next_loc: str):
         """
         Move a piece on the board.
 
         Args:
-            curr_pos (str): The current coordinates of the piece in algebraic
+            curr_loc (str): The current coordinates of the piece in algebraic
                 notation (e.g. "a1", "h8").
-            next_pos (str): The coordinates of the square that the piece is
+            next_loc (str): The coordinates of the square that the piece is
                 moving to in algebraic notation.
-        Returns:
-            None
         """
-        cp: CoordT = get_coords(curr_pos) # type: ignore
-        np: CoordT = get_coords(next_pos) # type: ignore
+        cp: CoordT = get_coords(curr_loc)
+        np: CoordT = get_coords(next_loc)
         if self.valid_move(cp, np) == False:
             return False
         part = self.board[cp[1]][cp[0]]
-        self.add_move_history(curr_pos, next_pos, part)
+        self.add_move_history(cp, np, part)
         if np == self.en_passant and (part == 1 or part == -1):
             self.board[
                 self.en_passant[1] -(self.player * -1)# type: ignore
                 ][self.en_passant[0]] = 0 # type: ignore
-        self.log_move(part, curr_pos, next_pos, cp, np)
+        self.log_move(part, curr_loc, next_loc, cp, np)
         if (part == 1 and np[1] == 4) or (part == -1 and np[1] == 3):
             self.en_passant = (
                 (np[0], np[1] + 1) if part == 1 else (np[0], np[1] - 1)
