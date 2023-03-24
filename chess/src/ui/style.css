@@ -1,0 +1,117 @@
+* {
+	content-align: center middle;
+	text-align: center;
+	/* outline: solid red; */
+}
+
+
+Screen {
+	layout: grid;
+	grid-size: 3;
+	grid-rows: 13% 80% 7%;
+	background: #000000;
+}
+
+
+InfoArea {
+	column-span: 3;
+	height: 100%;
+	width: 100%
+}
+
+BoardArea {
+	layout: grid;
+	grid-size: 2 2;
+	grid-columns: 7% 93%;
+	grid-rows: 90% 10%;
+	height: 100%;
+	column-span: 2;
+	min-width: 43;
+	min-height: 43;
+	outline: solid red;
+}
+
+
+Board {
+	column-span: 1;
+	height: 100%;
+	layout: grid;
+	grid-size: 8 8;
+	width: 100%;
+	height: 100%;
+	min-width: 40;
+	min-height: 40;
+}
+
+Bottom {
+	layout: grid;
+	grid-size: 8 1;
+	padding-left: 1;
+}
+
+
+Left {
+	layout: grid;
+	grid-size: 1 8;
+}
+
+.indicator {
+	height: 100%;
+	column-span: 1;
+}
+
+
+Stats {
+	column-span: 1;
+	height: 100%;
+}
+
+InputArea {
+	column-span: 3;
+	height: 100%;
+}
+
+
+
+Box {
+	/* border: solid blue; */
+	column-span: 1;
+	content-align: center middle;
+	min-height: 5;
+	min-width: 5;
+	padding: 0;
+}
+
+
+Box.dark {
+	background: $secondary-background-darken-2;
+}
+
+Box.light {
+	background: $secondary-darken-2;
+}
+
+Box.selected {
+	tint: $accent-lighten-1 70%;
+}
+
+Box.valid {
+	tint: $accent-lighten-3 30%;
+}
+
+
+#main {
+	background: $primary-background;
+	border: double black;
+	width: auto;
+	height: auto;
+}
+
+/* #board {
+	width: 59;
+	height: auto;
+	content-align: center middle;
+	padding: 0 1 0 1;
+	margin-top: 0;
+	padding-left: 0;
+} */

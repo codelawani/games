@@ -539,7 +539,7 @@ However, if you roll a two, you can advance the coin by two squares and then it 
     Enjoy the game and have fun.
         # Best of luck #
 '''
-# tkinter.messagebox.showinfo('Welcome', welcome_msg)
+tkinter.messagebox.showinfo('Welcome', welcome_msg)
 
 top = tk.Toplevel(root)
 top.geometry('600x600')
@@ -547,4 +547,4 @@ top.title('Nickname')
 top.protocol("WM_DELETE_WINDOW", on_closing)
 root.protocol("WM_DELETE_WINDOW", on_closingroot)
 create_enterpage()
-# root.mainloop()
+root.mainloop()
