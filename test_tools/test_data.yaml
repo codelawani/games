@@ -164,3 +164,42 @@
   Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
   Result: Pass
   Comment: reset_game() correctly resets the game board to a blank state.
+
+- Id: 14
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "X".
+    - 4. Set the game_over attribute of the instance to True.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.
+
+- Id: 15
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "X".
+    - 4. Set the game_over attribute of the instance to False.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.
+
+- Id: 16
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "O".
+    - 4. Set the game_over attribute of the instance to False.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.
