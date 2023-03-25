@@ -65,7 +65,7 @@ class Move:
             "from_loc": self.from_loc,
             "to_loc": self.to_loc,
             "piece": self.piece,
-            "log": self.log,
+            "log": self.log[:],
             "epd": self.epd,
             "next": self.next.serialize() if self.next else None,
         }
@@ -90,6 +90,91 @@ class Move:
             next=cls.deserialize(data["next"]) if data["next"] else None,
         )
 
+@dataclass
+class State:
+    """
+    State of the chess game.
+    """
+
+    hash: EPDString
+    moves: 'dict[CoordT, list[CoordT]]' = field(default_factory=dict)
+    escape_moves: 'dict[CoordT, list[CoordT]]' = field(default_factory=dict)
+    has_check: bool = False
+    has_checkmate: bool = False
+    has_stalemate: bool = False
+    is_draw: bool = False
+    has_pawn_promotion: bool = False
+    has_fifty_move_rule: bool = False
+    has_seventyfive_move_rule: bool = False
+    has_threefold_repetition: bool = False
+    has_fivefold_repetition: bool = False
+    is_dead_position: bool = False
+
+
+class HasState:
+    """
+    Mixin for classes that have a state.
+    """
+
+    state: State
+
+    @property
+    def valid_moves(self) -> 'dict[CoordT, list[CoordT]]':
+        if self.state.has_check:
+            return self.state.escape_moves
+        return self.state.moves
+
+    @property
+    def moves(self) -> 'dict[CoordT, list[CoordT]]':
+        return self.state.moves
+
+    @property
+    def escape_moves(self) -> 'dict[CoordT, list[CoordT]]':
+        return self.state.escape_moves
+
+    @property
+    def hash(self) -> EPDString:
+        return self.state.hash
+
+    @property
+    def has_check(self) -> bool:
+        return self.state.has_check
+
+    @property
+    def has_checkmate(self) -> bool:
+        return self.state.has_checkmate
+
+    @property
+    def has_stalemate(self) -> bool:
+        return self.state.has_stalemate
+
+    @property
+    def is_draw(self) -> bool:
+        return self.state.is_draw
+
+    @property
+    def has_pawn_promotion(self) -> bool:
+        return self.state.has_pawn_promotion
+
+    @property
+    def has_fifty_move_rule(self) -> bool:
+        return self.state.has_fifty_move_rule
+
+    @property
+    def has_seventyfive_move_rule(self) -> bool:
+        return self.state.has_seventyfive_move_rule
+
+    @property
+    def has_threefold_repetition(self) -> bool:
+        return self.state.has_threefold_repetition
+
+    @property
+    def has_fivefold_repetition(self) -> bool:
+        return self.state.has_fivefold_repetition
+
+    @property
+    def is_dead_position(self) -> bool:
+        return self.state.is_dead_position
 
 @dataclass
 class Game:
@@ -144,11 +229,11 @@ class Game:
     ):
         """Add a move to the move history."""
         self.last_move = Move(
-            self.player,
+            1 if piece > 0 else -1,
             curr_pos,
             new_pos,
             piece,
-            self.log.copy(),
+            self.log[:],
             get_EPD(self),
             self.last_move,
         )
@@ -203,10 +288,10 @@ class Game:
         """
         return {
             "initial_pos": self.initial_pos,
-            "players": self.players,
-            "epd_hash": self.epd_hash,
+            "players": self.players[:],
+            "epd_hash": self.epd_hash.copy(),
             "epd": get_EPD(self),
-            "log": self.log,
+            "log": self.log[:],
             "last_move": self.last_move.serialize() if self.last_move else None,
         }
 
@@ -226,16 +311,19 @@ class Game:
         new.last_move = (
             Move.deserialize(data["last_move"]) if data["last_move"] else None
         )
-
         return new
 
     def save(self):
         """Save the game to a file."""
         with FILE.open("w") as f:
-            json.dump(self.serialize(), f)
+            json.dump(self.serialize(), f, indent=1)
 
     @classmethod
     def load(cls, file: Path) -> Self:
         """Load a game from a file."""
         with open(file, "r") as f:
             return cls.deserialize(json.load(f))
+
+    def copy(self) -> Self:
+        """Return a copy of the game."""
+        return self.deserialize(self.serialize())
