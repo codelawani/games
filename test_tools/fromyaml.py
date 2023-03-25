@@ -42,7 +42,7 @@ for test in tests:
     # Combine multiple steps into one cell
     row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
     for step in test['Steps']:
-        row_cells[2].add_paragraph(step)
+        row_cells[2].add_paragraph(step.strip('\r\n'))
     row_cells[3].text = str(test['Expected'])
     row_cells[4].text = str(test['Actual'])
     row_cells[5].text = str(test['Result'])
