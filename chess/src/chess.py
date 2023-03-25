@@ -4,7 +4,7 @@ from rich.table import Table
 from rich import box
 from rich.panel import Panel
 from rich import print as rprint
-from .epd import CoordT, get_EPD, get_coords, load_EPD, EPDString
+from .epd import CoordT, get_EPD, get_coords, get_loc, get_piece, load_EPD, EPDString
 from .game import Game
 from itertools import cycle
 from .piece import notations
@@ -196,7 +196,7 @@ class Chess(Game):
                         if (c, r) in self.c_escape
                         and move in self.c_escape[(c, r)]
                     ]
-                piece_annotation = f"{str(self.x[c]).upper() if p_colour > 0 else str(self.x[c]).lower()}{self.y[r]}"
+                piece_annotation = (str.lower if piece < 0 else str.upper)(get_loc((c, r)))
                 rprint((
                     f"Piece: {piece_annotation}"
                     f" Moves: {valid_moves}"
@@ -204,12 +204,44 @@ class Chess(Game):
                 moves[piece_annotation] = valid_moves
         return moves
 
-    def is_checkmate(self, moves: 'dict[str, list[CoordT]]'):
+    def is_check(self, possible_moves: 'dict[str, list[CoordT]]'):
+        """
+        Determine if the current board state is a check.
+
+        Args:
+            possible_moves:
+                A dictionary containing the current possible moves for each piece on the board.
+        Returns:
+            bool: True if the current board state is a check, False otherwise.
+        """
+        k_pos = tuple()  # King position
+        u_moves: 'dict[CoordT, list[CoordT]]' = {}  # User potential moves
+
+        # Sort all possible moves
+        for piece, moves in possible_moves.items():
+            coord: CoordT = get_coords(piece) # type: ignore
+            if (str(piece[0]).isupper() and self.player == -1) or (
+                str(piece[0]).islower() and self.player == 1
+            ):
+                if get_piece(self, coord) == notations.get_id('k') * (
+                    (self.player * -1)):
+                    k_pos = (coord, moves)
+            else:
+                u_moves.setdefault(coord, moves)
+        p_moves = [m for a in u_moves.values() for m in a]
+        "possible moves"
+        # Check if checkmate is in possible moves
+        if k_pos and k_pos[0] not in p_moves:
+            return False
+        return True
+
+    def is_checkmate(self, possible_moves: 'dict[str, list[CoordT]]'):
         """
         Determines if the current board state is a checkmate, indicating the end of the game.
 
         Args:
-            moves (dict): A dictionary containing the current possible moves for each piece on the board.
+            possible_moves:
+                A dictionary containing the current possible moves for each piece on the board.
 
         Returns:
             A list containing three elements:
@@ -218,76 +250,61 @@ class Chess(Game):
                 3. The score for Black (an integer)
         """
         self.c_escape = {}
-        k_pos: tuple = ()  # King position
-        p_blocks = []  # Possible blocks
-        u_moves = {}  # User potential moves
+        opponents_king = notations.get_id('k') * (self.player * -1)
+        k_pos = tuple()  # King position
+        p_blocks: 'set[tuple[CoordT, CoordT]]' = set()  # Possible blocks
+        u_moves: 'dict[CoordT, list[CoordT]]' = {}  # User potential moves
         # Sort all possible moves
-        for p, a in moves.items():
-            pos: CoordT = get_coords(p) # type: ignore
-            if (str(p[0]).isupper() and self.player == -1) or (
-                str(p[0]).islower() and self.player == 1
+        for piece, moves in possible_moves.items():
+            coord: CoordT = get_coords(piece) # type: ignore
+            if (str(piece[0]).isupper() and self.player == -1) or (
+                str(piece[0]).islower() and self.player == 1
             ):
-                if self.board[pos[1]][pos[0]] == notations.get_id('k') * (
-                    (self.player * -1)):
-                    k_pos = (pos, a)
+                if get_piece(self, coord) == opponents_king:
+                    k_pos = (coord, moves)
                 else:
-                    for m in a:
-                        if (pos, m) not in p_blocks:
-                            p_blocks.append((pos, m))
+                    for move in moves:
+                        p_blocks.add((coord, move))
             else:
-                if pos not in u_moves:
-                    u_moves[pos] = a
-        k_pos = cast(tuple, k_pos)
+                u_moves.setdefault(coord, moves)
         p_moves = [m for a in u_moves.values() for m in a]
+        "possible moves"
         # Check if checkmate is in posible moves
-        if len(k_pos) > 0 and k_pos[0] not in p_moves:
+        if k_pos and k_pos[0] not in p_moves:
             return [0, 0, 0]
-        elif len(k_pos) == 0:
+        elif not k_pos:
             for y, row in enumerate(self.board):
-                if notations.get_id('k') * (self.player * -1) in row:
-                    k_pos = ((
-                        row.index(
-                            notations.get_id('k') * (self.player * -1)),
-                        y),[])
+                if opponents_king in row:
+                    k_pos = ((row.index(opponents_king), y),[])
                     break
-        k_pos = cast(tuple, k_pos)
-        if not (len(k_pos) > 0 and k_pos[0] in p_moves):
+        if not (k_pos and k_pos[0] in p_moves):
             return [1, 0, 0] if self.player == 1 else [0, 0, 1]
-        for m in p_blocks:
-            i_game = deepcopy(self)
-            i_game.p_move = i_game.p_move * (-1) # type: ignore
-            i_game.move(
-                f"{self.x[m[0][0]]}{self.y[m[0][1]]}",
-                f"{self.x[m[1][0]]}{self.y[m[1][1]]}",
-            )  # Move king
-            i_game.p_move = i_game.p_move * (-1) # type: ignore
-            i_moves = i_game.possible_board_moves()  # Imaginary moves
-            if True not in [
-                True for k in i_moves if k_pos[0] in i_moves[k]
-            ]:  # Check if moved king still in check
+        for move in p_blocks:
+            x_game = deepcopy(self)
+            x_game.switch_player()
+            x_game.move(get_loc(move[0]), get_loc(move[1]))  # Move king
+            x_game.switch_player()
+            i_moves = x_game.possible_board_moves()  # Imaginary moves
+            if not any(True for k in i_moves if k_pos[0] in i_moves[k]):
+                # Check if moved king still in check
                 # if len(self.log) > 0 and self.log[-1][-1] is not '+':
                 # self.log[-1] += '+' #Check
                 # print(m,f'{self.x[m[0][0]]}{self.y[m[0][1]]}', f'{self.x[m[1][0]]}{self.y[m[1][1]]}')
-                self.c_escape.setdefault(m[0], list()).append(m[1])
+                self.c_escape.setdefault(move[0], list()).append(move[1])
                 # return [0, 0, 0]
-        for m in k_pos[1]:
-            if m not in p_moves:
-                i_game = deepcopy(self)
-                i_game.p_move = i_game.p_move * (-1) # type: ignore
-                i_game.move(
-                    f"{self.x[k_pos[0][0]]}{self.y[k_pos[0][1]]}",
-                    f"{self.x[m[0]]}{self.y[m[1]]}",
-                )  # Move king
-                i_game.p_move = i_game.p_move * (-1) # type: ignore
-                i_moves = i_game.possible_board_moves()  # Imaginary moves
-                if True not in [
-                    True for k in i_moves if m in i_moves[k]
-                ]:  # Check if moved king still in check
+        for move in k_pos[1]:
+            if move not in p_moves:
+                x_game = deepcopy(self)
+                x_game.switch_player()
+                x_game.move(get_loc(k_pos[0]), get_loc(move))  # Move king
+                x_game.switch_player()
+                i_moves = x_game.possible_board_moves()  # Imaginary moves
+                if not any(True for k in i_moves if move in i_moves[k]):  # Check if moved king still in check
                     # if len(self.log) > 0 and self.log[-1][-1] is not '+':
                     # self.log[-1] += '+' #Check
                     # print(m)
                     # print(k_pos[0],m,f'{self.x[k_pos[0][0]]}{self.y[k_pos[0][1]]}', f'{self.x[m[0]]}{self.y[m[1]]}')
-                    self.c_escape.setdefault(k_pos[0], list()).append(m)
+                    self.c_escape.setdefault(k_pos[0], list()).append(move)
                     # return [0, 0, 0]
         if len(self.c_escape) > 0:
             self.log[-1] += "+"  # Check
