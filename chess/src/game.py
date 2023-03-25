@@ -229,7 +229,7 @@ class Game:
     ):
         """Add a move to the move history."""
         self.last_move = Move(
-            1 if piece > 0 else -1,
+            self.player,
             curr_pos,
             new_pos,
             piece,
