@@ -91,6 +91,23 @@ def get_piece(game: 'Game', coord: CoordT) -> int:
 	return game.board[coord[1]][coord[0]]
 
 
+def find_piece(game: 'Game', piece_id: int) -> CoordT:
+	"""
+	Find a piece on the game board.
+
+	Args:
+		game: an instance of the chess game
+		piece_id: the ID of the chess piece
+	Return:
+		the coordinates of the cell where the piece is
+	"""
+	for row in range(8):
+		for col in range(8):
+			if game.board[row][col] == piece_id:
+				return col, row
+	raise ValueError(f"Piece {piece_id} not found")
+
+
 def get_coords(loc: str) -> CoordT:
 	"""
 	Converts chess board location to a tuple of [x, y] coordinates.
@@ -107,14 +124,7 @@ def get_coords(loc: str) -> CoordT:
 	>>> get_coords("e4")
 	(3, 4)
 	"""
-	cord = tuple(loc)
-	if (
-		len(cord) != 2
-		or str(cord[0]).lower() not in X
-		or str(cord[1]) not in Y
-	): raise ValueError("Invalid location")
-
-	return X.index(str(cord[0]).lower()), Y.index(str(cord[1]))
+	return X.index(str(loc[0]).lower()), Y.index(str(loc[1]))
 	
 
 def get_loc(coords: CoordT) -> str:
@@ -134,7 +144,6 @@ def get_loc(coords: CoordT) -> str:
 	"""
 
 	return X[coords[0]] + Y[coords[1]]
-
 
 
 def load_EPD(game: Game, epd_string: EPDString) -> bool:
@@ -197,7 +206,7 @@ def get_EPD(game: Game) -> EPDString:
 			result += str(empty)
 		rows.append(result)
 	epd_string += "/".join(rows)
-	epd_string += f" {'b' if game.player == 1 else 'b'} "
+	epd_string += f" {'w' if game.player == 1 else 'b'} "
 	epd_string += "".join((
 		"K" if game.castling[0] == 1 else "",
 		"Q" if game.castling[1] == 1 else "",
