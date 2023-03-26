@@ -84,12 +84,55 @@ class Chess(Game):
                 c_escape.setdefault(k_pos[0], list()).append(move)
             else:
                 rprint(f"[bold red]Bad King move detected![/]: {get_loc(k_pos[0])} -> {get_loc(move)}")
+        if check:
+            if len(c_escape) == 0:
+                self.log[-1] += "#"
+            else:
+                self.log[-1] += "+"
         return check, c_escape
+
+    def promote_pawn(self, to: int) -> bool:
+        """
+        Promotes a pawn to another piece.
+
+        Args:
+            to: The piece to promote the pawn to.
+
+        Returns:
+            bool: True if the pawn was successfully promoted, False otherwise.
+        """
+        rprint(f"Current player: {self.player}")
+        part = to * self.player
+        if self.last_move == None:
+            return False
+        pos = self.last_move.to_loc 
+        rprint(f"Change: {get_piece(self, pos)}({get_loc(pos)}) -> {part} {notations.get_char(part, True)}")
+        if pos != None:
+            set_piece(self, pos, part)
+            self.log[-1] += f"={notations.get_char(to).upper()}"
+            return True
+        else:
+            return False
 
     def _is_pawn_promotion(self) -> bool:
         """
         Check if the last move was a pawn promotion. 
         """
+        if self.last_move == None:
+            return False
+        last_piece = get_piece(self, self.last_move.to_loc)
+        prev_loc = get_loc(self.last_move.from_loc)
+        new_loc = get_loc(self.last_move.to_loc)
+        if last_piece != notations.get_id("p") * self.player:
+            return False
+        if self.player == 1:
+            opponents_home = '8'
+        else:
+            opponents_home = '1'
+        if prev_loc[1] != opponents_home and new_loc[1] == opponents_home:
+            return True
+        return False
+        
         if (
             len(self.log) > 0
             and self.player == 1

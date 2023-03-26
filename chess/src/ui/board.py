@@ -6,6 +6,8 @@ from textual.app import App, ComposeResult
 from textual.widgets import Static
 from textual.reactive import reactive
 from textual.message import Message, MessageTarget
+
+from src.ui.messages import PieceDeselected, PieceSelected
 from ..epd import CoordT, get_loc, X, Y, get_piece
 from ..game import Game
 from ..piece import notations
@@ -39,10 +41,12 @@ class Box(Static):
 
 
 	piece: reactive[Text] = reactive(Text(''), always_update=True, layout=True)
+	piece_variant = reactive('filled', always_update=True, layout=True)
 
 	def __init__(
 		self, coords: CoordT,
-		variant: Literal['light', 'dark']):
+		variant: Literal['light', 'dark'],
+		):
 		self.coords = coords
 		location = get_loc(coords)
 		self.variant = variant
@@ -55,13 +59,14 @@ class Box(Static):
 	def on_mount(self):
 		"""Handle mounting this box."""
 		self.piece = get_piece(self.app.game, self.coords) # type: ignore
+		self.piece_variant = self.app.piece_variant # type: ignore
 
 	def render(self) -> Text:
 		"""Render this box."""
 		return self.piece # type: ignore
 	
 	def validate_piece(self, piece_id: int):
-		symbol = notations.get_symbol(piece_id)
+		symbol = notations.get_symbol(piece_id, variant=self.piece_variant) # type: ignore
 		color = "black" if piece_id < 0 else "white"
 		return Text(symbol, style=color)
 
@@ -69,17 +74,14 @@ class Box(Static):
 		"""Select this box."""
 		for box in self.app.query(Box):
 			box.deselect()
-		self.add_class("selected")
-		player = self.app.game.player
 		piece = get_piece(self.app.game, self.coords)
 		self.log(f"selecting box {get_loc(self.coords)}")
 		self.log(f"piece on selected box: {'white' if piece > 1 else 'black'} {notations.get_name(piece)}")
-		piece_type = notations.get_class(piece)
-		is_check, is_checkmate, is_stalemate, escape = self.app.game.get_game_state()
-		if is_checkmate or is_stalemate:
+		if self.app.is_checkmated or self.app.is_stalemated:
 			return False
-		valid_moves = escape
-		for move in valid_moves.get(self.coords, []):
+		self.add_class("selected")
+		return True
+		for move in self.app.valid_moves.get(self.coords, ()):
 			self.app.query_one(f"#box-{get_loc(move)}", Box).add_class("valid")
 		self.app.selected_piece = self.coords
 
@@ -91,15 +93,35 @@ class Box(Static):
 		self.log(f"deselecting box {get_loc(self.coords)!r}")
 		self.log(f"piece on deselected box: {'white' if piece > 1 else 'black'} {notations.get_name(piece)}")
 		self.remove_class("selected")
-		self.app.query("Box.valid").remove_class("valid")
-		self.app.selected_piece = None
-
+	
 	def on_click(self):
 		"""Handle a click on this box."""
-		if self.has_class("selected"):
-			return self.deselect()
 		piece = get_piece(self.app.game, self.coords)
 		player = self.app.game.player
+		if not self.app.selected_piece and piece == 0:
+			# the box is empty
+			self.log.error("Clicked on empty box")
+			return self.app.bell()
+		if not self.app.selected_piece and piece * player < 0:
+			# the piece belongs to the opponent
+			self.log.error("Clicked on opponent's piece")
+			return self.app.bell()
+		if self.app.selected_piece == self.coords:
+			# the box is already selected
+			self.log.info("Clicked on already selected box")
+			_ = self.app.on_piece_deselected(PieceDeselected(self, self.coords))
+			return
+		if self.app.selected_piece and piece * player > 0:
+			# select a different piece
+			self.log.info("Clicked on another piece")
+			_ = self.app.on_piece_deselected(PieceDeselected(self, self.coords))
+			_ = self.app.on_piece_selected(PieceSelected(self, self.coords))
+			return
+		# select a piece
+		self.log.info("Clicked on a piece")
+		_ = self.app.on_piece_selected(PieceSelected(self, self.coords))
+		return
+		
 		# if the current player selects his piece again,
 		# the new piece selected should act as the new
 		# .selected piece
@@ -117,7 +139,8 @@ class Box(Static):
 				# it's a valid move!
 				self.app.move_piece(self.coords)
 				box_id = "#box-" + get_loc(selected)
-				self.app.query_one(box_id, Box).deselect()
+				for box in self.app.query(box_id):
+					box.deselect() # type: ignore
 			else:
 				self.app.bell()
 				self.log.error("Clicked on wrong box")
@@ -148,6 +171,10 @@ class Board(Widget):
 			for col in range(8):
 				yield Box((col, row), variant=next(style))
 			next(style)
+
+	def on_show(self):
+		"""Handle showing this board."""
+		self.app.action_update_board()
 
 
 class BoardArea(Widget):

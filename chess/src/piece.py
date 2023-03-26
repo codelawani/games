@@ -25,6 +25,7 @@ class PieceNotation(NamedTuple):
 	name: str
 	char: str
 	symbol: tuple[str, str]
+	points: int
 
 
 class Piece(ABC):
@@ -38,12 +39,12 @@ class Piece(ABC):
 
 class notations:
 	pieces = (
-		PieceNotation(1, "pawn",   'p', ('♙', '♟')),
-		PieceNotation(2, "knight", 'n', ('♘', '♞')),
-		PieceNotation(3, "bishop", 'b', ('♗', '♝')),
-		PieceNotation(4, "rook",   'r', ('♖', '♜')),
-		PieceNotation(5, "queen",  'q', ('♕', '♛')),
-		PieceNotation(6, "king",   'k', ('♔', '♚')),
+		PieceNotation(1, "pawn",   'p', ('♙', '♟'), 1),
+		PieceNotation(2, "knight", 'n', ('♘', '♞'), 3),
+		PieceNotation(3, "bishop", 'b', ('♗', '♝'), 3),
+		PieceNotation(4, "rook",   'r', ('♖', '♜'), 5),
+		PieceNotation(5, "queen",  'q', ('♕', '♛'), 8),
+		PieceNotation(6, "king",   'k', ('♔', '♚'), 0),
 	) 
 
 	@classmethod
