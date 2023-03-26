@@ -120,10 +120,10 @@ class ChessApp(App):
 	@property
 	def is_saved(self) -> bool:
 		if not hasattr(self, "_saved"):
-			if len(FILE.read_text()) < 5:
+			try:
 				new = Chess.load(FILE)
 				self._saved = get_EPD(self.game) == get_EPD(new)
-			else:
+			except Exception:
 				self._saved = self.game.last_move is None
 		return self._saved
 
