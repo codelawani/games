@@ -90,6 +90,16 @@ def get_piece(game: 'Game', coord: CoordT) -> int:
 	"""
 	return game.board[coord[1]][coord[0]]
 
+def set_piece(game: 'Game', coord: CoordT, piece_id: int) -> None:
+	"""
+	Set a piece on the game board.
+
+	Args:
+		game: an instance of the chess game
+		coord: the coordinates of the cell where the piece is
+		piece_id: the ID of the chess piece
+	"""
+	game.board[coord[1]][coord[0]] = piece_id
 
 def find_piece(game: 'Game', piece_id: int) -> CoordT:
 	"""
