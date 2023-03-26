@@ -38,7 +38,7 @@ class Box(Static):
 	app: 'ChessApp'
 
 
-	piece: reactive[Text] = reactive(Text(''))
+	piece: reactive[Text] = reactive(Text(''), always_update=True, layout=True)
 
 	def __init__(
 		self, coords: CoordT,
@@ -75,8 +75,11 @@ class Box(Static):
 		self.log(f"selecting box {get_loc(self.coords)}")
 		self.log(f"piece on selected box: {'white' if piece > 1 else 'black'} {notations.get_name(piece)}")
 		piece_type = notations.get_class(piece)
-		valid_moves = piece_type.moves(self.app.game, player, self.coords)
-		for move in valid_moves:
+		is_check, is_checkmate, is_stalemate, escape = self.app.game.get_game_state()
+		if is_checkmate or is_stalemate:
+			return False
+		valid_moves = escape
+		for move in valid_moves.get(self.coords, []):
 			self.app.query_one(f"#box-{get_loc(move)}", Box).add_class("valid")
 		self.app.selected_piece = self.coords
 
@@ -136,6 +139,7 @@ class Box(Static):
 
 class Board(Widget):
 	"""The chess board."""
+	app: 'ChessApp'
 
 	def compose(self) -> ComposeResult:
 		game: Game = self.app.game # type: ignore
@@ -148,6 +152,7 @@ class Board(Widget):
 
 class BoardArea(Widget):
 	"""The board with it's immediate surrounding components."""
+	app: 'ChessApp'
 
 	def compose(self) -> ComposeResult:
 		"""Setup the board area."""
@@ -155,3 +160,4 @@ class BoardArea(Widget):
 		yield Board(id="board")
 		yield Static("")
 		yield Bottom(id="bottom")
+
