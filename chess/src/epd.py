@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 """
 Extended Position Description
 
@@ -54,12 +55,11 @@ Example:
 
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, NewType, Optional
-from .piece import (
-	notations
-)
+
+from .piece import notations
 
 if TYPE_CHECKING:
-	from .game import Game
+    from .game import Game
 
 
 EPDString = NewType("EPDString", str)
@@ -74,154 +74,161 @@ BoardT = list[list[int]]
 
 
 def switch_p_move(p_move: Literal[-1, 1]) -> Literal[-1, 1]:
-	"""Switch active player"""
-	return p_move * (-1)
+    """Switch active player"""
+    return p_move * (-1)
 
 
-def get_piece(game: 'Game', coord: CoordT) -> int:
-	"""
-	Get a piece on the game board.
+def get_piece(game: "Game", coord: CoordT) -> int:
+    """
+    Get a piece on the game board.
 
-	Args:
-		game: an instance of the chess game
-		coord: the coordinates of the cell where the piece is
-	Return:
-		the ID of the chess piece
-	"""
-	return game.board[coord[1]][coord[0]]
+    Args:
+            game: an instance of the chess game
+            coord: the coordinates of the cell where the piece is
+    Return:
+            the ID of the chess piece
+    """
+    return game.board[coord[1]][coord[0]]
 
-def set_piece(game: 'Game', coord: CoordT, piece_id: int) -> None:
-	"""
-	Set a piece on the game board.
 
-	Args:
-		game: an instance of the chess game
-		coord: the coordinates of the cell where the piece is
-		piece_id: the ID of the chess piece
-	"""
-	game.board[coord[1]][coord[0]] = piece_id
+def set_piece(game: "Game", coord: CoordT, piece_id: int) -> None:
+    """
+    Set a piece on the game board.
 
-def find_piece(game: 'Game', piece_id: int) -> CoordT:
-	"""
-	Find a piece on the game board.
+    Args:
+            game: an instance of the chess game
+            coord: the coordinates of the cell where the piece is
+            piece_id: the ID of the chess piece
+    """
+    game.board[coord[1]][coord[0]] = piece_id
 
-	Args:
-		game: an instance of the chess game
-		piece_id: the ID of the chess piece
-	Return:
-		the coordinates of the cell where the piece is
-	"""
-	for row in range(8):
-		for col in range(8):
-			if game.board[row][col] == piece_id:
-				return col, row
-	raise ValueError(f"Piece {piece_id} not found")
+
+def find_piece(game: "Game", piece_id: int) -> CoordT:
+    """
+    Find a piece on the game board.
+
+    Args:
+            game: an instance of the chess game
+            piece_id: the ID of the chess piece
+    Return:
+            the coordinates of the cell where the piece is
+    """
+    for row in range(8):
+        for col in range(8):
+            if game.board[row][col] == piece_id:
+                return col, row
+    raise ValueError(f"Piece {piece_id} not found")
 
 
 def get_coords(loc: str) -> CoordT:
-	"""
-	Converts chess board location to a tuple of [x, y] coordinates.
+    """
+    Converts chess board location to a tuple of [x, y] coordinates.
 
-	Args:
-		loc: A string containing the chess board location in the format
-			"a1", "b2", etc.
+    Args:
+            loc: A string containing the chess board location in the format
+                    "a1", "b2", etc.
 
-	Returns:
-		tuple or None: A tuple containing the row and column indexes for the chess board,
-		or None if the input is invalid.
+    Returns:
+            tuple or None: A tuple containing the row and column indexes for the chess board,
+            or None if the input is invalid.
 
-	Example:
-	>>> get_coords("e4")
-	(3, 4)
-	"""
-	return X.index(str(loc[0]).lower()), Y.index(str(loc[1]))
-	
+    Example:
+    >>> get_coords("e4")
+    (3, 4)
+    """
+    return X.index(str(loc[0]).lower()), Y.index(str(loc[1]))
+
 
 def get_loc(coords: CoordT) -> str:
-	"""
-	Converts chess board coordinates to location.
-	Inverse of `get_coords`.
+    """
+    Converts chess board coordinates to location.
+    Inverse of `get_coords`.
 
-	Args:
-		coords: A sequence of [x, y] coordinates
-	Returns:
-		A string representing the board location in the format
-		"a1", "b2"....
+    Args:
+            coords: A sequence of [x, y] coordinates
+    Returns:
+            A string representing the board location in the format
+            "a1", "b2"....
 
-	Example:
-	>>> get_loc((3, 4))
-	'e5'
-	"""
+    Example:
+    >>> get_loc((3, 4))
+    'e5'
+    """
 
-	return X[coords[0]] + Y[coords[1]]
+    return X[coords[0]] + Y[coords[1]]
 
 
 def load_EPD(game: Game, epd_string: EPDString) -> bool:
-	"""
-	Load a chess position in Extended Position Description (EPD) format.
+    """
+    Load a chess position in Extended Position Description (EPD) format.
 
-	This method takes an EPD string and creates the chess board accordingly.
+    This method takes an EPD string and creates the chess board accordingly.
 
-	Args:
-		game (state): The game's state
-		epd_string (str): The EPD string to be loaded.
+    Args:
+            game (state): The game's state
+            epd_string (str): The EPD string to be loaded.
 
-	Returns:
-		(bool): True if epd_string was parsed else false
-	"""
-	data = epd_string.split(" ")
-	if len(data) != 4:
-		return False
-	for r, row in enumerate(data[0].split("/")):
-		c = 0
-		for piece in row:
-			if piece.isdigit():
-				for i in range(int(piece)):
-					game.board[r][c] = 0
-					c += 1
-			else:
-				game.board[r][c] = notations.get_id(piece, True)
-				c += 1
-	game.player = 1 if data[1] == "w" else -1
-	# castling
-	for i, row in enumerate("KQkq"):
-		game.castling[i] = int(row in data[2])
-	game.en_passant = (
-		None if data[3] == "-" else get_coords(data[3])
-	)
-	return True
+    Returns:
+            (bool): True if epd_string was parsed else false
+    """
+    data = epd_string.split(" ")
+    if len(data) != 4:
+        return False
+    for r, row in enumerate(data[0].split("/")):
+        c = 0
+        for piece in row:
+            if piece.isdigit():
+                for i in range(int(piece)):
+                    game.board[r][c] = 0
+                    c += 1
+            else:
+                game.board[r][c] = notations.get_id(piece, True)
+                c += 1
+    game.player = 1 if data[1] == "w" else -1
+    # castling
+    for i, row in enumerate("KQkq"):
+        game.castling[i] = int(row in data[2])
+    game.en_passant = None if data[3] == "-" else get_coords(data[3])
+    return True
 
 
 def get_EPD(game: Game) -> EPDString:
-	"""
-	Converts the current chess board state into Extended Position Description (EPD) format.
+    """
+    Converts the current chess board state into Extended Position Description (EPD) format.
 
-	Returns:
-		str: The EPD hash string representing the current state of the chess board.
-	"""
-	rows: 'list[str]' = []
-	epd_string = ""
-	for r, row in enumerate(game.board):
-		result = ""
-		empty = 0
-		for piece in row:
-			if piece == 0:
-				empty += 1
-			else:
-				if empty > 0:
-					result += str(empty)
-				empty = 0
-				result += notations.get_char(piece, True)
-		if empty > 0:
-			result += str(empty)
-		rows.append(result)
-	epd_string += "/".join(rows)
-	epd_string += f" {'w' if game.player == 1 else 'b'} "
-	epd_string += "".join((
-		"K" if game.castling[0] == 1 else "",
-		"Q" if game.castling[1] == 1 else "",
-		"k" if game.castling[2] == 1 else "",
-		"q" if game.castling[3] == 1 else ""
-	)) or "-"
-	epd_string += f" {'-' if game.en_passant == None else get_loc(game.en_passant)}"
-	return EPDString(epd_string)
+    Returns:
+            str: The EPD hash string representing the current state of the chess board.
+    """
+    rows: "list[str]" = []
+    epd_string = ""
+    for r, row in enumerate(game.board):
+        result = ""
+        empty = 0
+        for piece in row:
+            if piece == 0:
+                empty += 1
+            else:
+                if empty > 0:
+                    result += str(empty)
+                empty = 0
+                result += notations.get_char(piece, True)
+        if empty > 0:
+            result += str(empty)
+        rows.append(result)
+    epd_string += "/".join(rows)
+    epd_string += f" {'w' if game.player == 1 else 'b'} "
+    epd_string += (
+        "".join(
+            (
+                "K" if game.castling[0] == 1 else "",
+                "Q" if game.castling[1] == 1 else "",
+                "k" if game.castling[2] == 1 else "",
+                "q" if game.castling[3] == 1 else "",
+            )
+        )
+        or "-"
+    )
+    epd_string += (
+        f" {'-' if game.en_passant == None else get_loc(game.en_passant)}"
+    )
+    return EPDString(epd_string)

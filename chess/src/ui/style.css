@@ -14,23 +14,6 @@ GameEPD {
 	text-align: left;
 }
 
-#dialog {
-	grid-size: 2;
-	grid-gutter: 1 2;
-	padding: 1 2;
-}
-
-#dialog #question {
-	column-span: 2;
-	content-align: center bottom;
-	width: 100%;
-	height: 100%;
-}
-
-#dialog Button {
-	width: 100%;
-}
-
 
 #main {
 	padding: 1;
