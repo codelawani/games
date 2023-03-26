@@ -1,10 +1,9 @@
 from copy import deepcopy
-from typing import cast
 from rich.table import Table
 from rich import box
 from rich.panel import Panel
 from rich import print as rprint
-from .epd import CoordT, get_EPD, get_coords, get_loc, get_piece, load_EPD, EPDString
+from .epd import CoordT, get_EPD, get_coords, get_loc, get_piece, load_EPD, EPDString, set_piece
 from .game import Game
 from itertools import cycle
 from .piece import notations
@@ -12,41 +11,183 @@ from .piece import notations
 
 EPD = EPDString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -")
 
+
+
 class Chess(Game):
     """
     Chess Implementation
     """
-
     x = "abcdefgh"
     y = "87654321"
 
     def __init__(self, epd: EPDString = EPD):
         super().__init__(epd)
         self.c_escape: 'dict[CoordT, list[CoordT]]' = {}
+        self.captured: 'dict[int, list[int]]' = {1: [], -1: []}
         load_EPD(self, epd)
-
-    def reset(self, epd: EPDString):
+    
+    def _on_check(self) -> 'tuple[bool, dict[CoordT, list[CoordT]]]':
         """
-        Resets the Chess game to its initial state.
+        Check if the king is in check.
 
         Args:
-            epd (str): The EPD string representing the starting position
-            of the game. Defaults to the standard starting position.
+            king: The king's coordinates and possible moves
+            p_moves: The possible moves of the other pieces
         Returns:
-            None
-        The method resets the game state by resetting the
-        - game log
-        - EPD hashtable
-        - current player's move
-        - castling control,
-        - en passant control
-        - previous move
-        - and board
-        The method then loads in the EPD string to set the game to its
-        starting position.
+            bool: True if the king is in check, False otherwise
+            dict: The possible moves of the pieces that can escape check
         """
-        self.__init__(epd)
+        check = False
+        c_escape: 'dict[CoordT, list[CoordT]]' = {}
+        possible_moves = self.get_all_moves()
+        king = notations.get_id('k') * (self.player)
+        k_pos = tuple()  # King position
+        p_moves: 'set[tuple[CoordT, CoordT]]' = set()  # Possible blocks
+        # Sort all possible moves
+        for piece, moves in possible_moves.items():
+            if not moves:
+                continue
+            if get_piece(self, piece) == king:
+                k_pos = (piece, moves)
+            else:
+                for move in moves:
+                    p_moves.add((piece, move))
+        # Check if checkmate is in posible moves
+        if not k_pos:
+            for y, row in enumerate(self.board):
+                if king in row:
+                    k_pos = ((row.index(king), y),[])
+                    break
+        # Check if king is in check
+        for move in p_moves:
+            x_game = self.copy()
+            x_game.switch_player()
+            i_moves = x_game.get_all_moves()  # Imaginary moves
+            if any(k_pos[0] in moves for moves in i_moves.values()):
+                check = True
 
+        for move in p_moves:
+            x_game = self.copy()
+            x_game.move(get_loc(move[0]), get_loc(move[1]))  # Move piece
+            x_game.switch_player()
+            i_moves = x_game.get_all_moves()  # Imaginary moves
+            if not any(k_pos[0] in moves for moves in i_moves.values()):
+                c_escape.setdefault(move[0], list()).append(move[1])
+            else:
+                rprint(f"[bold red]Bad Piece move detected![/]: {get_loc(move[0])} -> {get_loc(move[1])}")
+        for move in k_pos[1]:
+            x_game = self.copy()
+            x_game.move(get_loc(k_pos[0]), get_loc(move))  # Move king
+            x_game.switch_player()
+            i_moves = x_game.get_all_moves()  # Imaginary moves
+            if not any(move in m for m in i_moves.values()):  # Check if moved king still in check
+                c_escape.setdefault(k_pos[0], list()).append(move)
+            else:
+                rprint(f"[bold red]Bad King move detected![/]: {get_loc(k_pos[0])} -> {get_loc(move)}")
+        return check, c_escape
+
+    def _is_pawn_promotion(self) -> bool:
+        """
+        Check if the last move was a pawn promotion. 
+        """
+        if (
+            len(self.log) > 0
+            and self.player == 1
+            and (self.log[-1][0].isupper() == False or self.log[-1][0] == "P")
+            and True in [True for l in self.log[-1] if l == "8"]
+        ):
+            return True  # Pawn promotion
+        elif (
+            len(self.log) > 0
+            and self.player == -1
+            and (self.log[-1][0].isupper() == False or self.log[-1][0] == "P")
+            and True in [True for l in self.log[-1] if l == "1"]
+        ):
+            return True  # Pawn promotion
+        return False
+
+    def _is_fifty_move_rule(self) -> bool:
+        """
+        Check if the 50 move rule has been reached. 
+        """
+        if len(self.log) > 100:
+            for m in self.log[-100:]:
+                if "x" in m or m[0].islower():
+                    return False
+            return True
+        else:
+            return False
+
+    def _is_seventy_five_move_rule(self) -> bool:
+        """
+        Check if the 75 move rule has been reached. 
+        """
+        if len(self.log) > 150:
+            for m in self.log[-150:]:
+                if "x" in m or m[0].islower():
+                    return False
+            return True
+        else:
+            return False
+
+    def _is_threefold_repetition(self) -> bool:
+        """
+        Check if the threefold repetition rule has been reached. 
+        """
+        hash = get_EPD(self)
+        if hash not in self.epd_hash:
+            return False
+        if self.epd_hash[hash] >= 3:
+            return True
+        return False
+
+    def _is_fivefold_repetition(self) -> bool:
+        """
+        Check if the fivefold repetition rule has been reached. 
+        """
+        hash = get_EPD(self)
+        if hash not in self.epd_hash:
+            return False
+        if self.epd_hash[hash] >= 5:
+            return True
+        return False
+
+    def _is_dead_position(self):
+        """
+        Determine whether the current position is a "dead position" (i.e., a position where neither player can win). A position is a dead position if it is one of the following:
+
+        * King and bishop against king and bishop with both bishops on squares
+            of the same color
+        * King and knight against king
+        * King against king with no other pieces on the board
+
+        Args:
+            moves (int): The current move number.
+
+        Returns:
+            bool: True if the current position is a dead position,
+                False otherwise.
+        """
+        a_pieces = []
+        for y in self.board:
+            for x in y:
+                if x != 0:
+                    a_pieces.append(x)
+                if len(a_pieces) > 4:
+                    return False
+        if len(a_pieces) == 2 and -6 in a_pieces and 6 in a_pieces:
+            return True
+        elif len(a_pieces) == 3 and (
+            (-6 in a_pieces and 3 in a_pieces and 6 in a_pieces)
+            or (-6 in a_pieces and -3 in a_pieces and 6 in a_pieces)
+        ):
+            return True
+        elif len(a_pieces) == 3 and (
+            (-6 in a_pieces and 2 in a_pieces and 6 in a_pieces)
+            or (-6 in a_pieces and -2 in a_pieces and 6 in a_pieces)
+        ):
+            return True
+        return False
 
     def display(self):
         """
@@ -83,7 +224,6 @@ class Chess(Game):
         board.add_row(*h_indicators)
         rprint(Panel.fit(board))
 
-
     def move(self, curr_loc: str, next_loc: str):
         """
         Move a piece on the board.
@@ -96,9 +236,9 @@ class Chess(Game):
         """
         cp: CoordT = get_coords(curr_loc)
         np: CoordT = get_coords(next_loc)
-        if self.valid_move(cp, np) == False:
-            return False
-        part = self.board[cp[1]][cp[0]]
+        # if self.valid_move(cp, np) == False:
+        #     return False
+        part = get_piece(self, cp)
         self.add_move_history(cp, np, part)
         if np == self.en_passant and (part == 1 or part == -1):
             self.board[
@@ -135,13 +275,14 @@ class Chess(Game):
                     self.castling[3] = 0
                 else:
                     self.castling[2] = 0
-        self.board[cp[1]][cp[0]] = 0
-        self.board[np[1]][np[0]] = part
+        occupant = get_piece(self, np)
+        if occupant != 0:
+            self.captured[self.player].append(occupant)
+        set_piece(self, cp, 0)
+        set_piece(self, np, part)
         hash = get_EPD(self)
-        if hash in self.epd_hash:
-            self.epd_hash[hash] += 1
-        else:
-            self.epd_hash[hash] = 1
+        self.epd_hash.setdefault(hash, 0)
+        self.epd_hash[hash] += 1
         return True
 
     def valid_move(self, cur_pos, next_pos):
@@ -156,54 +297,61 @@ class Chess(Game):
         Returns:
             bool: True if the move is valid, False otherwise.
         """
-        piece = self.board[cur_pos[1]][cur_pos[0]]
-        if piece == 0 or piece * self.player < 0:
+        piece = get_piece(self, cur_pos)
+        if self.player * piece <= 0:
             return False
-        if piece * self.player > 0 and piece != 0:
-            p_cls = notations.get_class(piece)
-            valid_moves = p_cls.moves(self, self.player, cur_pos)
-            if len(self.log) > 0 and "+" in self.log[-1]:
-                valid_moves = [
-                    move
-                    for move in valid_moves
-                    if move in self.c_escape.get(cur_pos, [])
-                ]
-            if next_pos in valid_moves:
+        is_check, is_checkmate, is_stalemate, escape = self.get_game_state()
+        if is_checkmate or is_stalemate:
+            return False
+        if is_check:
+            moves = escape
+        else:
+            moves = self.get_all_moves()
+        if cur_pos in moves:
+            if next_pos in moves[cur_pos]:
                 return True
         return False
 
-    def possible_board_moves(self):
+    def get_all_moves(self) -> 'dict[CoordT, list[CoordT]]':
         """
-        Returns a dictionary of all possible moves on the current board for each piece,
-        where the key is a string representing the piece's position and the value is a list
+        Return a dictionary of all possible moves on the current board for each piece,
+        where the key is a tuple representing the piece's position and the value is a list
         of possible next positions.
 
         Returns:
             dict: A dictionary of all possible moves on the current board for each piece.
         """
-        moves: 'dict[str, list[CoordT]]' = {}
+        moves: 'dict[CoordT, list[CoordT]]' = {}
         for r, row in enumerate(self.board):
             for c, piece in enumerate(row):
-                if piece == 0:
+                if piece * self.player <= 0:
                     continue
                 p_cls = notations.get_class(piece)
-                p_colour = 1 if piece > 0 else -1
-                valid_moves = p_cls.moves(self, p_colour, (c, r))
-                if len(self.log) > 0 and "+" in self.log[-1]:
-                    valid_moves = [
-                        move
-                        for move in valid_moves
-                        if (c, r) in self.c_escape
-                        and move in self.c_escape[(c, r)]
-                    ]
-                piece_annotation = (str.lower if piece < 0 else str.upper)(get_loc((c, r)))
-                rprint((
-                    f"Piece: {piece_annotation}"
-                    f" Moves: {valid_moves}"
-                ))
-                moves[piece_annotation] = valid_moves
+                valid_moves = p_cls.moves(self, self.player, (c, r))
+                moves[(c, r)] = valid_moves
         return moves
 
+    def get_game_state(self):
+        """
+        """
+        is_check, c_escape = self._on_check()
+        if not len(c_escape) and is_check:
+            is_checkmate = True
+            self.log += "#"
+        else:
+            is_checkmate = False
+            self.log += "+" if is_check else ""
+        if not len(c_escape) and not is_check:
+            is_stalemate = True
+        else:
+            is_stalemate = False
+        return (is_check, is_checkmate, is_stalemate, c_escape)
+
+
+class LegacyChess(Chess):
+    """
+    A class representing a chess game.
+    """
     def is_check(self, possible_moves: 'dict[str, list[CoordT]]'):
         """
         Determine if the current board state is a check.
@@ -485,7 +633,8 @@ class Chess(Game):
         """
         Determine whether the current position is a "dead position" (i.e., a position where neither player can win). A position is a dead position if it is one of the following:
 
-        * King and bishop against king and bishop with both bishops on squares of the same color
+        * King and bishop against king and bishop with both bishops on squares
+            of the same color
         * King and knight against king
         * King against king with no other pieces on the board
 
@@ -493,7 +642,8 @@ class Chess(Game):
             moves (int): The current move number.
 
         Returns:
-            bool: True if the current position is a dead position, False otherwise.
+            bool: True if the current position is a dead position,
+                False otherwise.
         """
         a_pieces = []
         for y in self.board:
@@ -644,3 +794,59 @@ class Chess(Game):
             return "50M"  # 50 move
         else:
             return None
+    
+    def possible_board_moves(self):
+        """
+        Returns a dictionary of all possible moves on the current board for each piece,
+        where the key is a string representing the piece's position and the value is a list
+        of possible next positions.
+
+        Returns:
+            dict: A dictionary of all possible moves on the current board for each piece.
+        """
+        moves: 'dict[str, list[CoordT]]' = {}
+        for r, row in enumerate(self.board):
+            for c, piece in enumerate(row):
+                if piece == 0:
+                    continue
+                p_cls = notations.get_class(piece)
+                p_colour = 1 if piece > 0 else -1
+                valid_moves = p_cls.moves(self, p_colour, (c, r))
+                if len(self.log) > 0 and "+" in self.log[-1]:
+                    valid_moves = [
+                        move
+                        for move in valid_moves
+                        if (c, r) in self.c_escape
+                        and move in self.c_escape[(c, r)]
+                    ]
+                piece_annotation = (str.lower if piece < 0 else str.upper)(get_loc((c, r)))
+                moves[piece_annotation] = valid_moves
+        return moves
+
+    def valid_move(self, cur_pos, next_pos):
+        """
+        Check if a move from current position to the next position is valid.
+
+        Args:
+            cur_pos (tuple): A tuple of two integers representing the current
+                position on the board in (row, column) format.
+            next_pos (tuple): A tuple of two integers representing the next
+                position on the board in (row, column) format.
+        Returns:
+            bool: True if the move is valid, False otherwise.
+        """
+        piece = self.board[cur_pos[1]][cur_pos[0]]
+        if piece == 0 or piece * self.player < 0:
+            return False
+        if piece * self.player > 0 and piece != 0:
+            p_cls = notations.get_class(piece)
+            valid_moves = p_cls.moves(self, self.player, cur_pos)
+            if len(self.log) > 0 and "+" in self.log[-1]:
+                valid_moves = [
+                    move
+                    for move in valid_moves
+                    if move in self.c_escape.get(cur_pos, [])
+                ]
+            if next_pos in valid_moves:
+                return True
+        return False
