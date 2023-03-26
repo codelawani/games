@@ -6,39 +6,56 @@
 
 
 Screen {
-	layout: grid;
-	grid-size: 3;
-	grid-rows: 13% 80% 7%;
 	background: #000000;
 }
 
-
-InfoArea {
-	column-span: 3;
-	height: 100%;
-	width: 100%
+GameEPD {
+	color: red;
+	text-align: left;
 }
+
+#dialog {
+	grid-size: 2;
+	grid-gutter: 1 2;
+	padding: 1 2;
+}
+
+#dialog #question {
+	column-span: 2;
+	content-align: center bottom;
+	width: 100%;
+	height: 100%;
+}
+
+#dialog Button {
+	width: 100%;
+}
+
+
+#main {
+	padding: 1;
+	min-width: 55;
+	min-height: 45;
+}
+
+
 
 BoardArea {
 	layout: grid;
 	grid-size: 2 2;
 	grid-columns: 7% 93%;
 	grid-rows: 90% 10%;
+	width: 70%;
 	height: 100%;
-	column-span: 2;
-	min-width: 43;
-	min-height: 43;
-	outline: solid red;
+	min-width: 45;
+	min-height: 45;
 }
 
 
 Board {
 	column-span: 1;
-	height: 100%;
 	layout: grid;
 	grid-size: 8 8;
-	width: 100%;
-	height: 100%;
 	min-width: 40;
 	min-height: 40;
 }
@@ -46,13 +63,19 @@ Board {
 Bottom {
 	layout: grid;
 	grid-size: 8 1;
-	padding-left: 1;
+	width: 100%;
+	min-width: 40;
+	height: 100%;
+	min-height: 3;
 }
-
 
 Left {
 	layout: grid;
 	grid-size: 1 8;
+	width: 100%;
+	min-width: 3;
+	height: 100%;
+	min-height: 40;
 }
 
 .indicator {
@@ -60,21 +83,25 @@ Left {
 	column-span: 1;
 }
 
+Bottom .indicator {
+	content-align: center top;
+}
+
+Left .indicator {
+	content-align: right middle;
+}
 
 Stats {
-	column-span: 1;
 	height: 100%;
+	width: 30%;
+	border: double blue;
 }
 
-InputArea {
-	column-span: 3;
-	height: 100%;
+Stats Static {
+	color: white;
 }
-
-
 
 Box {
-	/* border: solid blue; */
 	column-span: 1;
 	content-align: center middle;
 	min-height: 5;
@@ -99,19 +126,6 @@ Box.valid {
 	tint: $accent-lighten-3 30%;
 }
 
-
-#main {
-	background: $primary-background;
-	border: double black;
-	width: auto;
-	height: auto;
+Box.check {
+	background: red;
 }
-
-/* #board {
-	width: 59;
-	height: auto;
-	content-align: center middle;
-	padding: 0 1 0 1;
-	margin-top: 0;
-	padding-left: 0;
-} */
