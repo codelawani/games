@@ -1,3 +1,5 @@
 *.pyc
 .vscode
 data__pycache__
+src/data
+src/ui/__pycache__
