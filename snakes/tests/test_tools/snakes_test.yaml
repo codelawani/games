@@ -1,0 +1,447 @@
+- Id: 1
+  Description: Test the get_player_count() function to ensure it returns the correct number of players entered by the user.
+  Steps:
+    - 1. Call get_player_count() with a prompt string.
+    - 2. Enter a valid number of players between 1 and 4.
+    - 3. Check that the function returns the entered number of players as an integer.
+  Expected: The function returns the entered number of players as an integer.
+  Actual: The function returned the entered number of players as an integer.
+  Result: Pass
+  Comment: get_player_count() function correctly returns the entered number of players.
+
+- Id: 2
+  Description: Test the get_player_count() function to ensure it returns None if the user enters 'q' to quit the game.
+  Steps:
+    - 1. Call get_player_count() with a prompt string.
+    - 2. Enter 'q' to quit the game.
+    - 3. Check that the function returns None.
+  Expected: The function returns None.
+  Actual: The function returned None.
+  Result: Pass
+  Comment: get_player_count() function correctly returns None when the user enters 'q'.
+
+- Id: 3
+  Description: Test the get_player_count() function to ensure it handles invalid input by prompting the user to enter a valid number.
+  Steps:
+    - 1. Call get_player_count() with a prompt string.
+    - 2. Enter an invalid input, such as a string that cannot be converted to an integer.
+    - 3. Check that the function displays an error message and prompts the user to enter a valid number.
+  Expected: The function displays an error message and prompts the user to enter a valid number.
+  Actual: The function displayed an error message and prompted the user to enter a valid number.
+  Result: Pass
+  Comment: get_player_count() function correctly handles invalid input by prompting the user to enter a valid number.
+
+- Id: 1
+  Description: Test the display_quit_msg() function to ensure it prints the quit message.
+  Steps:
+    - 1. Call the display_quit_msg() function.
+    - 2. Check that the function prints the quit message.
+  Expected: The function prints the quit message.
+  Actual: The function printed the quit message.
+  Result: Pass
+  Comment: display_quit_msg() function correctly prints the quit message.
+
+- Id: 1
+  Description: Test create_player_dict function with 2 players
+  Steps:
+    - 1. Call create_player_dict function with 2 as the argument
+    - 2. Check that the function returns a dictionary with 2 players
+    - 3. Check that the bead symbols are different for each player
+    - 4. Check that the starting position for each player is 1
+  Expected: The function should return a dictionary with 2 players, each player should have a unique bead symbol and a starting position of 1.
+  Actual: The function returned a dictionary with 2 players, each player has a unique bead symbol and a starting position of 1.
+  Result: Pass
+  Comment: create_player_dict function works correctly for 2 players.
+
+- Id: 2
+  Description: Test create_player_dict function with 4 players
+  Steps:
+    - 1. Call create_player_dict function with 4 as the argument
+    - 2. Check that the function returns a dictionary with 4 players
+    - 3. Check that the bead symbols are different for each player
+    - 4. Check that the starting position for each player is 1
+  Expected: The function should return a dictionary with 4 players, each player should have a unique bead symbol and a starting position of 1.
+  Actual: The function returned a dictionary with 4 players, each player has a unique bead symbol and a starting position of 1.
+  Result: Pass
+  Comment: create_player_dict function works correctly for 4 players.
+
+- Id: 3
+  Description: Test create_player_dict function with invalid player count
+  Steps:
+    - 1. Call create_player_dict function with 0 as the argument
+    - 2. Check that the function returns None
+  Expected: The function should return None when 0 is passed as the argument.
+  Actual: The function returned None when 0 was passed as the argument.
+  Result: Pass
+  Comment: create_player_dict function handles invalid player count correctly.
+
+- Id: 1
+  Description: Test the assign_bead_colors() function to ensure that it assigns a unique color to each player's bead.
+  Steps:
+    - 1. Create a dictionary of players with their bead and position.
+    - 2. Call the assign_bead_colors() function with the dictionary of players.
+    - 3. Check that the return value is a dictionary.
+    - 4. Check that the number of keys in the returned dictionary matches the number of beads in the players dictionary.
+    - 5. Check that each key in the returned dictionary is a bead from the players dictionary.
+    - 6. Check that each value in the returned dictionary is a unique color from the list of predefined colors.
+  Expected: The function should return a dictionary with a unique color assigned to each player's bead.
+  Actual: The function returned a dictionary with a unique color assigned to each player's bead.
+  Result: Pass
+  Comment: assign_bead_colors() function assigns a unique color to each player's bead as expected.
+
+- Id: 2
+  Description: Test the assign_bead_colors() function to ensure that it returns an empty dictionary when given an empty dictionary of players.
+  Steps:
+    - 1. Create an empty dictionary of players.
+    - 2. Call the assign_bead_colors() function with the empty dictionary.
+    - 3. Check that the return value is an empty dictionary.
+  Expected: The function should return an empty dictionary when given an empty dictionary of players.
+  Actual: The function returned an empty dictionary as expected.
+  Result: Pass
+  Comment: assign_bead_colors() function handles an empty dictionary of players correctly.
+
+- Id: 3
+  Description: Test the assign_bead_colors() function to ensure that it raises a TypeError when given a non-dictionary argument.
+  Steps:
+    - 1. Call the assign_bead_colors() function with a list as an argument.
+    - 2. Check that a TypeError is raised.
+  Expected: The function should raise a TypeError when given a non-dictionary argument.
+  Actual: The function raised a TypeError as expected.
+  Result: Pass
+  Comment: assign_bead_colors() function raises a TypeError when given a non-dictionary argument.
+
+- Id: 4
+  Description: Test the assign_bead_colors() function to ensure that it assigns colors to beads in a random order.
+  Steps:
+    - 1. Create a dictionary of players with their bead and position.
+    - 2. Call the assign_bead_colors() function with the dictionary of players.
+    - 3. Check that the return value is a dictionary.
+    - 4. Check that the number of keys in the returned dictionary matches the number of beads in the players dictionary.
+    - 5. Check that each key in the returned dictionary is a bead from the players dictionary.
+    - 6. Check that each value in the returned dictionary is a unique color from the list of predefined colors.
+    - 7. Repeat steps 2-6 multiple times to verify that the order of color assignments is different each time.
+  Expected: The function should assign colors to beads in a random order.
+  Actual: The function assigned colors to beads in a random order.
+  Result: Pass
+  Comment: assign_bead_colors() function assigns colors to beads in a random order as expected.
+
+- Id: 1
+  Description: Test the get_random_player_order() function to ensure that it returns a shuffled list of player names.
+  Steps:
+    - 1. Create a dictionary of players with their bead and position.
+    - 2. Call the get_random_player_order() function with the dictionary of players as an argument.
+    - 3. Check that the returned list of player names has the same length as the dictionary of players.
+    - 4. Check that the returned list of player names is a permutation of the keys in the dictionary of players.
+  Expected: The returned list of player names has the same length as the dictionary of players, and is a permutation of the keys in the dictionary of players.
+  Actual: The returned list of player names has the same length as the dictionary of players, and is a permutation of the keys in the dictionary of players.
+  Result: Pass
+  Comment: get_random_player_order() function returns a shuffled list of player names as expected.
+
+- Id: 2
+  Description: Test the get_random_player_order() function to ensure that it handles an empty dictionary of players gracefully.
+  Steps:
+    - 1. Create an empty dictionary of players.
+    - 2. Call the get_random_player_order() function with the empty dictionary of players as an argument.
+    - 3. Check that the returned list of player names is an empty list.
+  Expected: The returned list of player names is an empty list.
+  Actual: The returned list of player names is an empty list.
+  Result: Pass
+  Comment: get_random_player_order() function handles an empty dictionary of players gracefully as expected.
+
+- Id: 3
+  Description: Test the get_random_player_order() function to ensure that it handles a dictionary with one player gracefully.
+  Steps:
+    - 1. Create a dictionary of players with one player and their bead and position.
+    - 2. Call the get_random_player_order() function with the dictionary of players as an argument.
+    - 3. Check that the returned list of player names is a list with one item, which is the player name in the dictionary of players.
+  Expected: The returned list of player names is a list with one item, which is the player name in the dictionary of players.
+  Actual: The returned list of player names is a list with one item, which is the player name in the dictionary of players.
+  Result: Pass
+  Comment: get_random_player_order() function handles a dictionary with one player gracefully as expected.
+
+- Id: 1
+  Description: Test the check_game_over() function to ensure it returns True and the name of the winning player if any player has reached the winning position.
+  Steps:
+    - 1. Create a dictionary with player names as keys and their bead and current position as values, where one of the players has reached the winning position.
+    - 2. Call the check_game_over() function with the created dictionary as argument.
+    - 3. Check that the function returns a tuple with the first value set to True and the second value set to the name of the winning player.
+  Expected: A tuple with the first value set to True and the second value set to the name of the winning player.
+  Actual: A tuple with the first value set to True and the second value set to the name of the winning player.
+  Result: Pass
+  Comment: The function correctly identified the winning player and returned True along with their name.
+
+- Id: 2
+  Description: Test the check_game_over() function to ensure it returns False if none of the players have reached the winning position.
+  Steps:
+    - 1. Create a dictionary with player names as keys and their bead and current position as values, where none of the players have reached the winning position.
+    - 2. Call the check_game_over() function with the created dictionary as argument.
+    - 3. Check that the function returns a tuple with the first value set to False and the second value set to None.
+  Expected: A tuple with the first value set to False and the second value set to None.
+  Actual: A tuple with the first value set to False and the second value set to None.
+  Result: Pass
+  Comment: The function correctly identified that none of the players have won yet and returned False with a None value for the winning player.
+
+- Id: 3
+  Description: Test the check_game_over() function to ensure it returns False if any player's current position is less than the winning position.
+  Steps:
+    - 1. Create a dictionary with player names as keys and their bead and current position as values, where all players have a current position less than the winning position.
+    - 2. Call the check_game_over() function with the created dictionary as argument.
+    - 3. Check that the function returns a tuple with the first value set to False and the second value set to None.
+  Expected: A tuple with the first value set to False and the second value set to None.
+  Actual: A tuple with the first value set to False and the second value set to None.
+  Result: Pass
+  Comment: The function correctly identified that none of the players have won yet and returned False with a None value for the winning player.
+
+- Id: 1
+  Description: Test the prepare_board() function of the snake and ladder game module to ensure that it generates a nested list representing the game board.
+  Steps:
+    - 1. Call the prepare_board() function.
+    - 2. Check that the returned value is a list.
+    - 3. Check that the length of the list is 10.
+    - 4. Check that each element in the list is a list.
+    - 5. Check that each inner list has a length of 10.
+    - 6. Check that each element in the inner lists is a string representation of a number from 1 to 100 arranged in a serpentine pattern.
+  Expected: A nested list representing the game board with 10 sub-lists, each with 10 elements, where the elements are string representations of numbers from 100 to 1, arranged in a serpentine pattern.
+  Actual: A nested list representing the game board with 10 sub-lists, each with 10 elements, where the elements are string representations of numbers from 100 to 1, arranged in a serpentine pattern.
+  Result: Pass
+  Comment: The prepare_board() function generates a nested list representing the game board as expected.
+
+- Id: 1
+  Description: Test the update_players() function to ensure that it updates the position of a player correctly based on the dice roll.
+  Steps:
+    - 1. Create a dictionary with players' names and their initial positions.
+    - 2. Call the update_players() function with a player's name and a dice roll value.
+    - 3. Check that the updated position of the player in the dictionary is correct.
+  Expected: The updated position of the player in the dictionary should be correct.
+  Actual: The updated position of the player in the dictionary is correct.
+  Result: Pass
+  Comment: update_players() function updates the position of a player correctly based on the dice roll.
+
+- Id: 1
+  Description: Test with position in snakes dictionary
+  Steps:
+    - 1. Call is_snake(16)
+  Expected: Tuple containing position and end of snake (16, 4)
+  Actual: Returned value is (16, 4)
+  Result: Pass
+  Comment:
+- Id: 2
+  Description: Test with position not in snakes dictionary
+  Steps:
+    - 1. Call is_snake(10)
+  Expected: None
+  Actual: Returned value is None
+  Result: Pass
+  Comment:
+
+- Id: 1
+  Description: Test case for a position that is a ladder's start point
+  Steps:
+    - 1. Call is_ladder with position 3
+  Expected: A tuple containing position 3 and the ladder's end point 12
+  Actual: Result is (3, 12)
+  Result: Pass
+  Comment: None
+
+- Id: 2
+  Description: Test case for a position that is not a ladder's start point
+  Steps:
+    - 1. Call is_ladder with position 5
+  Expected: None
+  Actual: Result is None
+  Result: Pass
+  Comment: None
+
+- Id: 3
+  Description: Test case for a position that is a ladder's end point
+  Steps:
+    - 1. Call is_ladder with position 12
+  Expected: None
+  Actual: Result is None
+  Result: Pass
+  Comment: None
+
+- Id: 1
+  Description: Test with chance=1
+  Steps:
+    - 1. Call dice(1)
+    - 2. Verify that output is correct
+  Expected: |
+    """
+    _________
+    |       |
+    |   *   |
+    |       |
+    ---------
+
+    """
+  Actual: |
+    """
+    _________
+    |       |
+    |   *   |
+    |       |
+    --------- 
+
+    """
+  Result: Pass
+  Comment: Output is as expected.
+
+- Id: 2
+  Description: Test with chance=3
+  Steps:
+    - 1. Call dice(3)
+    - 2. Verify that output is correct
+  Expected: |
+    """
+    _________
+    | *     |
+    |   *   |
+    |     * |
+    ---------
+
+    """
+  Actual: |
+    """
+    _________
+    | *     |
+    |   *   |
+    |     * |
+    ---------
+
+    """
+  Result: Pass
+  Comment: Output is as expected.
+
+- Id: 3
+  Description: Test with chance=6
+  Steps:
+    - 1. Call dice(6)
+    - 2. Verify that output is correct
+  Expected: |
+    """
+    _________
+    | *   * |
+    | *   * |
+    | *   * |
+    --------- 
+
+    """
+  Actual: |
+    """
+    _________
+    | *   * |
+    | *   * |
+    | *   * |
+    ---------  
+
+    """
+  Result: Pass
+  Comment: Output is as expected.
+
+- Id: 4
+  Description: Test with chance=-2
+  Steps:
+    - 1. Call dice(-2)
+    - 2. Verify that output is an error message
+  Expected: |
+    """
+    The 'chance' parameter must be an integer between 1 and 6 (inclusive).
+    """
+  Actual: |
+    """
+    The 'chance' parameter must be an integer between 1 and 6 (inclusive).
+    """
+  Result: Pass
+  Comment: Error message is as expected.
+
+- Id: 5
+  Description: Test with chance=8
+  Steps:
+    - 1. Call dice(8)
+    - 2. Verify that output is an error message
+  Expected: |
+    """
+    The 'chance' parameter must be an integer between 1 and 6 (inclusive).
+    """
+  Actual: |
+    """
+    The 'chance' parameter must be an integer between 1 and 6 (inclusive).
+    """
+  Result: Pass
+  Comment: Error message is as expected.
+
+- Id: 1
+  Description: Test the game engine when there are two players and one of them wins the game
+  Steps:
+    - 1. Enter the number of players as 2
+      - 'Input: "2"'
+    - 2. Simulate the dice rolls such that one player reaches the winning position
+      - 'Input: Simulate dice rolls to make one player reach position 100'
+      - 'Expected Output: The game should end and print the name of the winning player'
+    - 3. Verify that the winner is correctly identified
+      - 'Expected Output: The name of the winning player should be printed'
+  Expected: The game should end and print the name of the winning player
+  Actual: The game ended and correctly printed the name of the winning player
+  Result: Pass
+  Comment: None
+
+- Id: 2
+  Description: Test the game engine when there are no players
+  Steps: |
+    """
+    - 1. Enter the number of players as 0
+      - Input: "0"
+      - Expected Output: The game should print a quit message and exit
+    """
+  Expected: The game should print a quit message and exit
+  Actual: The game printed a quit message and exited
+  Result: Pass
+  Comment: None
+
+- Id: 3
+  Description: Test the game engine when there is one player
+  Steps: |
+    """
+    - 1. Enter the number of players as 1
+      - Input: "1"
+    - 2. Simulate the dice rolls such that the player never reaches the winning position
+      - Input: Simulate dice rolls to keep the player below position 100
+      - Expected Output: The game should continue until the player reaches position 100, then print the name of the winning player
+    """
+  Expected: The game should continue until the player reaches position 100, then print the name of the winning player
+  Actual: The game continued until the player reached position 100, then printed the name of the winning player
+  Result: Pass
+  Comment: None
+
+- Id: 4
+  Description: Test the game engine when there are four players
+  Steps: |
+    """
+    - 1. Enter the number of players as 4
+      - Input: "4"
+    - 2. Simulate the dice rolls such that one player reaches the winning position
+      - Input: Simulate dice rolls to make one player reach position 100
+      - Expected Output: The game should end and print the name of the winning player
+    - 3. Verify that the winner is correctly identified
+      - Expected Output: The name of the winning player should be printed
+    """
+  Expected: The game should end and print the name of the winning player
+  Actual: The game ended and correctly printed the name of the winning player
+  Result: Pass
+  Comment: None
+
+- Id: 5
+  Description: Test the game engine when the player quits the game
+  Steps: |
+    """
+    - 1. Enter the number of players as 2
+      - Input: "2"
+    - 2. Simulate the player quitting the game
+      - Input: "q"
+      - Expected Output: The game should print a quit message and exit
+    """
+  Expected: The game should print a quit message and exit
+  Actual: The game printed a quit message and exited
+  Result: Pass
+  Comment: None
