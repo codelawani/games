@@ -1,10 +1,8 @@
-import pickle
 from itertools import cycle
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 from rich.text import Text
-from textual.app import App, ComposeResult
-from textual.message import Message, MessageTarget
+from textual.app import ComposeResult
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.widgets import Static
