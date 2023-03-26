@@ -40,14 +40,9 @@ for test in tests:
     row_cells[0].text = str(test['Id'])
     row_cells[1].text = test['Description']
     # Combine multiple steps into one cell
-    row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-    count = 3
+    # row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
     for step in test['Steps']:
-        if count == 0:
-            break
-        print(step)
-        count -= 1
-        row_cells[2].add_paragraph(step.strip('\r\n'))
+        row_cells[2].text += step + '\n'
     row_cells[3].text = str(test['Expected'])
     row_cells[4].text = str(test['Actual'])
     row_cells[5].text = str(test['Result'])

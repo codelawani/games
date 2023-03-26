@@ -1,11 +1,11 @@
 {
- "initial_pos": "rn2kbnr/p1pqp1pp/5P2/1p1p4/1P1P4/8/P1PK2PP/RNB1Q1NR w kq b6",
+ "initial_pos": "rn2kbnr/p1pqp1pp/5P2/1p1p4/1P1P4/2N5/P1PK2PP/R1B1Q1NR b kq -",
  "players": [
   "White",
   "Black"
  ],
  "epd_hash": {
-  "rn2kbnr/p1pqp1pp/5P2/1p1p4/1P1P4/2N5/P1PK2PP/R1B1Q1NR w kq -": 1
+  "rn2kbnr/p1pqp2p/5p2/1p1p4/1P1P4/2N5/P1PK2PP/R1B1Q1NR b kq -": 1
  },
  "epd": "rn2kbnr/p1pqp1pp/5P2/1p1p4/1P1P4/2N5/P1PK2PP/R1B1Q1NR b kq -",
  "log": [
@@ -70,7 +70,8 @@
   "pxe7",
   "pf6",
   "pb5",
-  "nc3"
+  "nc3",
+  "pxf6"
  ],
  "last_move": {
   "player": 1,

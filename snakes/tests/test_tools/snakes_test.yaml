@@ -267,23 +267,17 @@
     - 1. Call dice(1)
     - 2. Verify that output is correct
   Expected: |
-    """
     _________
     |       |
     |   *   |
     |       |
     ---------
-
-    """
   Actual: |
-    """
     _________
     |       |
     |   *   |
     |       |
-    --------- 
-
-    """
+    ---------
   Result: Pass
   Comment: Output is as expected.
 
@@ -293,23 +287,17 @@
     - 1. Call dice(3)
     - 2. Verify that output is correct
   Expected: |
-    """
     _________
     | *     |
     |   *   |
     |     * |
     ---------
-
-    """
   Actual: |
-    """
     _________
     | *     |
     |   *   |
     |     * |
     ---------
-
-    """
   Result: Pass
   Comment: Output is as expected.
 
@@ -319,23 +307,17 @@
     - 1. Call dice(6)
     - 2. Verify that output is correct
   Expected: |
-    """
     _________
     | *   * |
     | *   * |
     | *   * |
-    --------- 
-
-    """
+    ---------
   Actual: |
-    """
     _________
     | *   * |
     | *   * |
     | *   * |
-    ---------  
-
-    """
+    ---------
   Result: Pass
   Comment: Output is as expected.
 
@@ -345,13 +327,9 @@
     - 1. Call dice(-2)
     - 2. Verify that output is an error message
   Expected: |
-    """
     The 'chance' parameter must be an integer between 1 and 6 (inclusive).
-    """
   Actual: |
-    """
     The 'chance' parameter must be an integer between 1 and 6 (inclusive).
-    """
   Result: Pass
   Comment: Error message is as expected.
 
@@ -361,13 +339,9 @@
     - 1. Call dice(8)
     - 2. Verify that output is an error message
   Expected: |
-    """
     The 'chance' parameter must be an integer between 1 and 6 (inclusive).
-    """
   Actual: |
-    """
     The 'chance' parameter must be an integer between 1 and 6 (inclusive).
-    """
   Result: Pass
   Comment: Error message is as expected.
 
@@ -375,12 +349,12 @@
   Description: Test the game engine when there are two players and one of them wins the game
   Steps:
     - 1. Enter the number of players as 2
-      - 'Input: "2"'
+    - " -Input: 2"
     - 2. Simulate the dice rolls such that one player reaches the winning position
-      - 'Input: Simulate dice rolls to make one player reach position 100'
-      - 'Expected Output: The game should end and print the name of the winning player'
+    - " -Input: Simulate dice rolls to make one player reach position 100"
+    - " -Expected Output: The game should end and print the name of the winning player"
     - 3. Verify that the winner is correctly identified
-      - 'Expected Output: The name of the winning player should be printed'
+    - " -Expected Output: The name of the winning player should be printed"
   Expected: The game should end and print the name of the winning player
   Actual: The game ended and correctly printed the name of the winning player
   Result: Pass
@@ -388,12 +362,10 @@
 
 - Id: 2
   Description: Test the game engine when there are no players
-  Steps: |
-    """
+  Steps:
     - 1. Enter the number of players as 0
-      - Input: "0"
-      - Expected Output: The game should print a quit message and exit
-    """
+    - " -Input: 0"
+    - " -Expected Output: The game should print a quit message and exit"
   Expected: The game should print a quit message and exit
   Actual: The game printed a quit message and exited
   Result: Pass
@@ -401,14 +373,12 @@
 
 - Id: 3
   Description: Test the game engine when there is one player
-  Steps: |
-    """
+  Steps:
     - 1. Enter the number of players as 1
-      - Input: "1"
+    - " -Input: 1"
     - 2. Simulate the dice rolls such that the player never reaches the winning position
-      - Input: Simulate dice rolls to keep the player below position 100
-      - Expected Output: The game should continue until the player reaches position 100, then print the name of the winning player
-    """
+    - " -Input: Simulate dice rolls to keep the player below position 100"
+    - " -Expected Output: The game should continue until the player reaches position 100, then print the name of the winning player"
   Expected: The game should continue until the player reaches position 100, then print the name of the winning player
   Actual: The game continued until the player reached position 100, then printed the name of the winning player
   Result: Pass
@@ -416,16 +386,14 @@
 
 - Id: 4
   Description: Test the game engine when there are four players
-  Steps: |
-    """
+  Steps:
     - 1. Enter the number of players as 4
-      - Input: "4"
+    - " -Input: 4"
     - 2. Simulate the dice rolls such that one player reaches the winning position
-      - Input: Simulate dice rolls to make one player reach position 100
-      - Expected Output: The game should end and print the name of the winning player
+    - " -Input: Simulate dice rolls to make one player reach position 100"
+    - " -Expected Output: The game should end and print the name of the winning player"
     - 3. Verify that the winner is correctly identified
-      - Expected Output: The name of the winning player should be printed
-    """
+    - " -Expected Output: The name of the winning player should be printed"
   Expected: The game should end and print the name of the winning player
   Actual: The game ended and correctly printed the name of the winning player
   Result: Pass
@@ -433,14 +401,12 @@
 
 - Id: 5
   Description: Test the game engine when the player quits the game
-  Steps: |
-    """
+  Steps:
     - 1. Enter the number of players as 2
-      - Input: "2"
+    - " -Input: 2"
     - 2. Simulate the player quitting the game
-      - Input: "q"
-      - Expected Output: The game should print a quit message and exit
-    """
+    - ' -Input: "q"'
+    - " -Expected Output: The game should print a quit message and exit"
   Expected: The game should print a quit message and exit
   Actual: The game printed a quit message and exited
   Result: Pass

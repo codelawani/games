@@ -7,7 +7,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 # Define the table structure (number of rows and columns)
 ROWS = 1
 COLUMNS = 7
-
+yamlfile = 'snakes_test.yaml'
+docxfile = 'test_snakes.docx'
 # Create a new Word document
 doc = docx.Document()
 
@@ -31,7 +32,7 @@ header[5].text = 'Result'
 header[6].text = 'Comment'
 
 # Read the test data from a file
-with open('test_data.yaml', 'r') as f:
+with open(file, 'r') as f:
     tests = yaml.safe_load(f)
 
 # Add the test data to the table
@@ -40,13 +41,13 @@ for test in tests:
     row_cells[0].text = str(test['Id'])
     row_cells[1].text = test['Description']
     # Combine multiple steps into one cell
-    row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+    # row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
     for step in test['Steps']:
-        row_cells[2].add_paragraph(step.strip('\r\n'))
+        row_cells[2].text += step + '\n'
     row_cells[3].text = str(test['Expected'])
     row_cells[4].text = str(test['Actual'])
     row_cells[5].text = str(test['Result'])
-    row_cells[6].text = test['Comment']
+    row_cells[6].text = str(test['Comment'])
 
 # Save the document
-doc.save('test_results.docx')
+doc.save(docxfile)

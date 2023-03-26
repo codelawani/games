@@ -1,8 +1,8 @@
 Im going to be giving you chunks of code.
 You are to create test plans in yaml.
-This is an example below showing exactly how I want you to write it
-This is only an example, You will have to write new test cases based on the code I give you
-
+This is an example below(its actually in a yaml code block, observe how the first line starts with a hyphen) showing exactly how I want you to write it
+This is only an example, You will have to write new test plans based on the code I give you
+```
 - Id: 1
   Description: Test the init() method of TicTacToe class to ensure that it initializes the game with a blank board, X as the starting player, and the game_over flag set to False.
   Steps:
@@ -14,40 +14,172 @@ This is only an example, You will have to write new test cases based on the code
   Actual: Board attribute is a list of 9 empty strings, current_player attribute is set to "X", and game_over attribute is set to False.
   Result: Pass
   Comment: init() method of TicTacToe class initializes the game state as expected.
-Here's the first bit of code:
+```
+Here's the first bit of code(This is a function that's part of a snake and ladder game module):
 
-class TicTacToe:
-    def __init__(self, root):
-        """
-        Initialize the TicTacToe game with a blank board and X as the starting player.
+```
+def update_players(players, name, dice):
+    """
+    Updates the position of a player on the board, based on the dice roll.
 
-        Args:
-        - root (Tk): The root window for the game.
-        """
+    Args:
+        players (dict): A dictionary containing player names mapped
+                        to a list of bead and position.
+                        dict(name -> [bead,number])
+        name (str): The name of the player to update.
+        dice (int): The number rolled on the dice.
 
-        self.root = root
-        self.root.title("Tic Tac Toe")
-        self.root.configure(background='#a7a9be')
-        # Initialize game state
-        self.board = [" "]*9
-        self.current_player = "X"
-        self.game_over = False
+    Returns:
+        dict: A dictionary containing the updated positions of all players.
+                dict(name -> [bead,number])
+    """
 
-        # Create game board
-        self.board_frame = tk.Frame(
-            root, background="blue", )
+    def is_snake(position):
+        snakes = {16: 4, 33: 20, 48: 24, 62: 56, 78: 69}
+        if position in snakes:
+            return (position, snakes[position])
 
-        self.board_frame.pack()
+    def is_ladder(position):
+        ladders = {3: 12, 7: 23, 20: 56, 47: 53, 60: 72, 80: 94}
+        if position in ladders:
+            return (position, ladders[position])
 
-        self.board_buttons = []
-        for i in range(9):
-            button = tk.Button(self.board_frame, text="", width=6, height=3, font=("Helvetica", 20),
-                               background="#0f0e17", fg="#fffffe", activebackground="#ff8906", highlightbackground="#a7a9be", command=lambda i=i: self.make_move(i))
-            button.grid(row=i//3, column=i % 3)
-            self.board_buttons.append(button)
+    player_p = players[name][1]
+    currentPos = player_p + dice
+    display_name = name.capitalize()
+    bluename = colored(display_name, "blue", attrs=["bold"])
+    redname = colored(display_name, "red", attrs=["bold"])
+    greenName = colored(display_name, "green", attrs=["bold"])
+    if is_snake(player_p + dice):
+        print(f"A snake ∫ is found on \"{is_snake(currentPos)[0]}\"\n"
+              f"RIP :( you've been  bitten, hope it wasn't a python :) ...")
+        print(f"{redname} you're now at {is_snake(player_p + dice)[1]}.\n")
+        players[name][1] = is_snake(player_p + dice)[1]
+    elif is_ladder(player_p + dice):
+        print("Wow! You found a ladder... \n Let's gooo!!")
+        print(
+            f"{greenName} you're now at \"{is_ladder(currentPos)[1]}\".\n")
+        players[name][1] = is_ladder(player_p + dice)[1]
+    else:
+        players[name][1] += dice
+        if players[name][1] > 100:
+            players[name][1] = 100
+        print(f"{bluename} has now moved to \"{players[name][1]}\".\n")
+```
+Please I don't want examples, write the test plans for me
+Write as many as u can
+Please it must be written in a [yaml code block]
+i will be very unhappy with u if u do otherwise
 
-        # Create reset button
-        self.reset_button = tk.Button(
-            root, text="Restart", width=10, background="#f25f4c", activebackground="#e53170", command=self.reset_game)
-        self.reset_button.pack(pady=10)
-Please make sure to write the test cases in yaml
+------------------------------------------------------------------------
+
+Write a test plan in YAML for the following function:
+
+```
+def play_game():
+    """Game engine that runs the game"""
+    print("\n"+"WELCOME TO".center(50, "."), "\n")
+    print(r"""        /\		     |-----|
+       //\\                  |-----|
+       ||                    |-----|
+       || SNAKES     and     |-----| LADDERS
+       ||                    |-----|
+    \\//                     |-----|
+     \/	                     |-----|
+    """)
+    # ask user how many players (must be less than <=4)
+    numbers = get_player_count("\nHow many people want to play: ")
+    if not numbers:
+        display_quit_msg()
+        exit()
+    # make dict of players
+    players = create_player_dict(numbers)
+    if not players:
+        display_quit_msg()
+        exit()
+    # assign different color to the beads
+    colors = assign_bead_colors(players)
+    # randomly assign the players chances
+    random_chances = get_random_player_order(players)
+    # counter to keep track of the chances
+    counter = 0
+    # while all the player position <= 100
+    while check_game_over(players)[0]:
+        # show the board with the beads
+        display_board(players, prepare_board(), colors)
+        # print whose chance is this and roll the dice
+        active_player = random_chances[counter % len(players)]
+        # current player's bead
+        active_player_bead = players[active_player][0]
+        # colored bead of the current player
+        colorBead = colored(
+            active_player_bead, colors[active_player_bead], None, ["bold"])
+        player = active_player.capitalize()
+        cprint("To roll the dice, Press any button and click Enter",
+               "blue")
+        cprint("'q/quit' quits the game",
+               "red", attrs=["blink"])
+        # print("Hint: r gets the dice rolling :)")
+        pos = players[active_player][1]
+        display_pos = f"Your bead {colorBead} is currently at position {pos}"
+
+        prompt = (f"Now It's {player}'s chance: {display_pos}\n"
+                  f"roll the DICE: ")
+        player_input = input(prompt).lower().strip()
+        # if player_input in ["r", "roll", ""]:
+
+        if player_input in ["q", "quit"]:
+            display_quit_msg()
+            exit()
+        else:
+            current_chance = random.randrange(1, 7)
+            print("\nROLLING ...\n")
+            colored_chance = colored(current_chance, "blue", None, [
+                                     "bold", "underline"])
+            print(f'It\'s a {colored_chance} !.')
+            # show the dice image
+            dice(current_chance)
+            # see whose chance is this, roll the dice
+            # and move the player's bead
+            update_players(players, active_player, current_chance)
+            if not (check_game_over(players)[0]):
+                display_board(players, prepare_board(), colors)
+
+        # increase the counter
+        counter += 1
+    # print the winner
+    winner = check_game_over(players)[1]
+    print("\n")
+    win_msg = f"Congratulations {winner.capitalize()}! You won the game!".center(
+        50, " ")
+    cprint(
+        win_msg, "green", attrs=["bold"])
+    print("\n")
+    return 0
+```
+Your test plan should include the following:
+
+Test case ID
+Description of the test case
+Test steps (including input data and expected output)
+Expected outcome
+Actual outcome
+Test result (pass/fail)
+Comments (optional)
+Please make sure to follow the YAML format exactly as in the example provided:
+
+```
+- Id: 1
+  Description: Test case description
+  Steps:
+    - 1. Step 1 description
+    - 2. Step 2 description
+    - 3. Step 3 description
+  Expected: Expected outcome description
+  Actual: Actual outcome description
+  Result: Pass/Fail
+  Comment: Additional comments (optional)
+```
+For my next prompts, I will only give u a piece of code and u just have to do what I have just instructed.
+first start with the one included in this prompt
+

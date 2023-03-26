@@ -3,7 +3,7 @@ This is a simple implementation of the classic Snake and Ladder board game in Py
 
 ## Installation
 ---
-To run the game, you will need Python 3 installed on your computer. You can download the latest version of Python from the official website [here](https://www.python.org/downloads/).
+To run the game, you will need Python 3 installed on your computer. You can download the latest version of Python from the official website (https://www.python.org/downloads/).
 
 
 ## Dependencies
