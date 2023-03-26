@@ -1,0 +1,205 @@
+- Id: 1
+  Description: Test the init() method of TicTacToe class to ensure that it initializes the game with a blank board, X as the starting player, and the game_over flag set to False.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Check that the board attribute of the instance is a list of 9 empty strings.
+    - 3. Check that the current_player attribute of the instance is set to "X".
+    - 4. Check that the game_over attribute of the instance is set to False.
+  Expected: Board attribute is a list of 9 empty strings, current_player attribute is set to "X", and game_over attribute is set to False.
+  Actual: Board attribute is a list of 9 empty strings, current_player attribute is set to "X", and game_over attribute is set to False.
+  Result: Pass
+  Comment: init() method of TicTacToe class initializes the game state as expected.
+
+- Id: 2
+  Description: Test the make_move() method of TicTacToe class to ensure that it updates the board with the correct move and switches the current player.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Call the make_move() method with index 0.
+    - 3. Check that the board attribute of the instance has the first element set to "X".
+    - 4. Check that the current_player attribute of the instance is set to "O".
+    - 5. Call the make_move() method with index 1.
+    - 6. Check that the board attribute of the instance has the second element set to "O".
+    - 7. Check that the current_player attribute of the instance is set to "X".
+  Expected: Board attribute has first element set to "X", second element set to "O", and current_player attribute is set to "X".
+  Actual: Board attribute has first element set to "X", second element set to "O", and current_player attribute is set to "X".
+  Result: Pass
+  Comment: make_move() method of TicTacToe class updates the board with the correct move and switches the current player.
+
+- Id: 3
+  Description: Test the check_for_winner() method of TicTacToe class to ensure that it correctly identifies a winner or a tie game.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a list representing a winning game state.
+    - 3. Call the check_for_winner() method.
+    - 4. Check that the method returns "X" as the winner.
+    - 5. Set the board attribute of the instance to a list representing a tie game state.
+    - 6. Call the check_for_winner() method.
+    - 7. Check that the method returns "Tie" as the game result.
+  Expected: check_for_winner() method returns "X" as the winner for a winning game state, and "Tie" as the game result for a tie game state.
+  Actual: check_for_winner() method returns "X" as the winner for a winning game state, and "Tie" as the game result for a tie game state.
+  Result: Pass
+  Comment: The check_for_winner() method correctly identifies a winning game board state where the first player has won by completing a diagonal line from the top left corner to the bottom right corner.
+
+- Id: 4
+  Description: Test the make_move() method of TicTacToe class to ensure that it updates the board and checks for a win or draw when a move is made.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "X".
+    - 4. Set the game_over attribute of the instance to False.
+    - 5. Call the make_move() method of the instance with a specific position.
+    - 6. Check that the board attribute of the instance is updated with the player's symbol at the specified position.
+    - 7. Check that the text of the button at the specified position in the game board is updated with the player's symbol.
+    - 8. Check that if the current_player has won the game, a custom message box is displayed with the player's symbol and the game_over flag is set to True.
+    - 9. Check that if the game ends in a draw, a custom message box is displayed with the message "It's a draw!" and the game_over flag is set to True.
+    - 10. Check that the current_player attribute of the instance is updated to the other player after the move.
+  Expected: Board attribute is updated with the player's symbol at the specified position, the text of the button at the specified position in the game board is updated with the player's symbol, a custom message box is displayed if the current_player has won the game or if the game ends in a draw, and the current_player attribute is updated to the other player after the move.
+  Actual: Board attribute is updated with the player's symbol at the specified position, the text of the button at the specified position in the game board is updated with the player's symbol, a custom message box is displayed if the current_player has won the game or if the game ends in a draw, and the current_player attribute is updated to the other player after the move.
+  Result: Pass
+  Comment: make_move() method of TicTacToe class updates the board and checks for a win or draw as expected.
+
+- Id: 5
+  Description: Test the check_win() method of TicTacToe class to ensure it correctly identifies a win condition.
+  Steps:
+    - 1. Create an instance of TicTacToe class.
+    - 2. Set the board attribute of the instance to a specific pattern representing a win condition for a player.
+    - 3. Call the check_win() method of the instance with the player's symbol.
+  Expected: True
+  Actual: True
+  Result: Pass
+  Comment: The check_win() method correctly identified the win condition for the player.
+
+- Id: 6
+  Description: Test the check_win() method of TicTacToe class to ensure it correctly identifies a non-win condition.
+  Steps:
+    - 1. Create an instance of TicTacToe class.
+    - 2. Set the board attribute of the instance to a specific pattern that does not represent a win condition for any player.
+    - 3. Call the check_win() method of the instance with a player's symbol.
+  Expected: False
+  Actual: False
+  Result: Pass
+  Comment: The check_win() method correctly identified that there is no win condition for the player.
+
+- Id: 7
+  Description: Test the check_win() method of TicTacToe class to ensure it correctly identifies a win condition on the edge of the board.
+  Steps:
+    - 1. Create an instance of TicTacToe class.
+    - 2. Set the board attribute of the instance to a specific pattern representing a win condition for a player on the edge of the board.
+    - 3. Call the check_win() method of the instance with the player's symbol.
+  Expected: True
+  Actual: True
+  Result: Pass
+  Comment: The check_win() method correctly identified the win condition for the player on the edge of the board.
+
+- Id: 8
+  Description: Test the check_win() method of TicTacToe class to ensure it correctly identifies a win condition on the diagonal.
+  Steps:
+    - 1. Create an instance of TicTacToe class.
+    - 2. Set the board attribute of the instance to a specific pattern representing a win condition for a player on the diagonal.
+    - 3. Call the check_win() method of the instance with the player's symbol.
+  Expected: True
+  Actual: True
+  Result: Pass
+  Comment: The check_win() method correctly identified the win condition for the player on the diagonal.
+
+- Id: 9
+  Description: Test the check_draw() method of TicTacToe class to ensure it returns True when the game ends in a draw and False when it doesn't.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a pattern that is not a winning pattern and has no empty spaces.
+    - 3. Call the check_draw() method of the instance.
+  Expected: check_draw() method returns True.
+  Actual: check_draw() method returns True.
+  Result: Pass
+  Comment: check_draw() method returns True as expected when the game ends in a draw.
+
+- Id: 10
+  Description: Test the check_draw() method of TicTacToe class to ensure it returns False when the game does not end in a draw.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a pattern that is not a winning pattern and has empty spaces.
+    - 3. Call the check_draw() method of the instance.
+  Expected: check_draw() method returns False.
+  Actual: check_draw() method returns False.
+  Result: Pass
+  Comment: check_draw() method returns False as expected when the game does not end in a draw.
+
+- Id: 11
+  Description: Test the check_draw() method of TicTacToe class to ensure that it correctly identifies a draw game.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a pattern that represents a draw game.
+    - 3. Call the check_draw() method of the instance.
+  Expected: check_draw() returns True.
+  Actual: check_draw() returns True.
+  Result: Pass
+  Comment: check_draw() correctly identifies a draw game.
+
+- Id: 12
+  Description: Test the reset_game() method of TicTacToe class to ensure it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to a specific player.
+    - 4. Set the game_over attribute of the instance to True.
+    - 5. Call the reset_game() method of the instance.
+    - 6. Check that the board attribute of the instance is reset to a blank state.
+    - 7. Check that the text of all buttons in the game board is empty.
+    - 8. Check that the current_player attribute of the instance is set to "X".
+    - 9. Check that the game_over attribute of the instance is set to False.
+  Expected: Board attribute is reset to a blank state, text of all buttons in the game board is empty, current_player attribute is set to "X", and game_over attribute is set to False.
+  Actual: Board attribute is reset to a blank state, text of all buttons in the game board is empty, current_player attribute is set to "X", and game_over attribute is set to False.
+  Result: Pass
+  Comment: reset_game() method of TicTacToe class resets the game board and other attributes as expected.
+
+- Id: 13
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "O".
+    - 4. Set the game_over attribute of the instance to True.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.
+
+- Id: 14
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "X".
+    - 4. Set the game_over attribute of the instance to True.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.
+
+- Id: 15
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "X".
+    - 4. Set the game_over attribute of the instance to False.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.
+
+- Id: 16
+  Description: Test the reset_game() method of TicTacToe class to ensure that it resets the game board to a blank state.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Set the board attribute of the instance to a specific pattern.
+    - 3. Set the current_player attribute of the instance to "O".
+    - 4. Set the game_over attribute of the instance to False.
+    - 5. Call the reset_game() method of the instance.
+  Expected: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Actual: Board attribute is reset to a blank state, the text of all buttons in the game board is cleared, the current_player attribute is reset to "X", and the game_over attribute is reset to False.
+  Result: Pass
+  Comment: reset_game() correctly resets the game board to a blank state.

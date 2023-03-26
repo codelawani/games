@@ -1,0 +1,53 @@
+Im going to be giving you chunks of code.
+You are to create test plans in yaml.
+This is an example below showing exactly how I want you to write it
+This is only an example, You will have to write new test cases based on the code I give you
+
+- Id: 1
+  Description: Test the init() method of TicTacToe class to ensure that it initializes the game with a blank board, X as the starting player, and the game_over flag set to False.
+  Steps:
+    - 1. Create an instance of TicTacToe class with a Tkinter root window.
+    - 2. Check that the board attribute of the instance is a list of 9 empty strings.
+    - 3. Check that the current_player attribute of the instance is set to "X".
+    - 4. Check that the game_over attribute of the instance is set to False.
+  Expected: Board attribute is a list of 9 empty strings, current_player attribute is set to "X", and game_over attribute is set to False.
+  Actual: Board attribute is a list of 9 empty strings, current_player attribute is set to "X", and game_over attribute is set to False.
+  Result: Pass
+  Comment: init() method of TicTacToe class initializes the game state as expected.
+Here's the first bit of code:
+
+class TicTacToe:
+    def __init__(self, root):
+        """
+        Initialize the TicTacToe game with a blank board and X as the starting player.
+
+        Args:
+        - root (Tk): The root window for the game.
+        """
+
+        self.root = root
+        self.root.title("Tic Tac Toe")
+        self.root.configure(background='#a7a9be')
+        # Initialize game state
+        self.board = [" "]*9
+        self.current_player = "X"
+        self.game_over = False
+
+        # Create game board
+        self.board_frame = tk.Frame(
+            root, background="blue", )
+
+        self.board_frame.pack()
+
+        self.board_buttons = []
+        for i in range(9):
+            button = tk.Button(self.board_frame, text="", width=6, height=3, font=("Helvetica", 20),
+                               background="#0f0e17", fg="#fffffe", activebackground="#ff8906", highlightbackground="#a7a9be", command=lambda i=i: self.make_move(i))
+            button.grid(row=i//3, column=i % 3)
+            self.board_buttons.append(button)
+
+        # Create reset button
+        self.reset_button = tk.Button(
+            root, text="Restart", width=10, background="#f25f4c", activebackground="#e53170", command=self.reset_game)
+        self.reset_button.pack(pady=10)
+Please make sure to write the test cases in yaml
