@@ -3,19 +3,19 @@ This module contains a base class that holds the game's state.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal, Optional
-from typing_extensions import Self
 
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
-from datetime import datetime
+from typing import TYPE_CHECKING, Optional
 
-from .epd import get_EPD, load_EPD, X, Y
+from typing_extensions import Self
+
+from .epd import X, Y, get_EPD, load_EPD
 from .piece import notations
 
 if TYPE_CHECKING:
-    from .epd import EPDString, CoordT, BoardT
+    from .epd import BoardT, CoordT, EPDString
     from .piece import PlayerT
 
 DIR = Path(__file__).parent.joinpath("data")
@@ -207,7 +207,9 @@ class Game:
             "epd_hash": self.epd_hash.copy(),
             "epd": get_EPD(self),
             "log": self.log[:],
-            "last_move": self.last_move.serialize() if self.last_move else None,
+            "last_move": self.last_move.serialize()
+            if self.last_move
+            else None,
         }
 
     @classmethod
