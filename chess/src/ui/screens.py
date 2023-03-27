@@ -148,6 +148,7 @@ class QuitGame(Screen):
         )
 
     def on_button_pressed(self, event: Button.Pressed):
+        self.app.pop_screen()
         if event.button.id == "save":
             self.app.action_save()
             self.app.exit()
@@ -155,7 +156,6 @@ class QuitGame(Screen):
             self.app.exit()
         elif event.button.id == "stay":
             pass
-        self.app.pop_screen()
 
 
 class Welcome(Screen):

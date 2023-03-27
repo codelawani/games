@@ -24,7 +24,6 @@ class Chess(Game):
     def __init__(self, epd: EPDString = EPD):
         super().__init__(epd)
         self.c_escape: "dict[CoordT, list[CoordT]]" = {}
-        self.captured: "dict[int, list[int]]" = {1: [], -1: []}
         load_EPD(self, epd)
 
     def _on_check(self) -> "tuple[bool, dict[CoordT, list[CoordT]]]":
@@ -274,7 +273,7 @@ class Chess(Game):
             self.board[
                 self.en_passant[1] - (self.player * -1)  # type: ignore
             ][
-                self.en_passant[0]
+                self.en_passant[0] # type: ignore
             ] = 0  # type: ignore
         self.log_move(part, curr_loc, next_loc, cp, np)
         if (part == 1 and np[1] == 4) or (part == -1 and np[1] == 3):
@@ -309,6 +308,7 @@ class Chess(Game):
                     self.castling[2] = 0
         occupant = get_piece(self, np)
         if occupant != 0:
+            print("Captured: " + notations.get_name(occupant))
             self.captured[self.player].append(occupant)
         set_piece(self, cp, 0)
         set_piece(self, np, part)

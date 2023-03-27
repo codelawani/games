@@ -148,6 +148,21 @@ class notations:
                     return piece.id
         return 0
 
+    @classmethod
+    def get_points(cls, id: int) -> int:
+        """
+        get the points of a chess piece.
+
+        Args:
+                id: the ID of the chess piece
+        Return:
+                the points of a chess piece or 0 if the piece doesn't exist
+        """
+        for piece in cls.pieces:
+            if piece.id == abs(id):
+                return piece.points
+        return 0
+
 
 class King(Piece):
     """Chess King"""

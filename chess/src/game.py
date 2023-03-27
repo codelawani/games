@@ -45,7 +45,7 @@ class Move:
     piece: int
     "piece that was moved"
 
-    log: list[str]
+    log: 'list[str]'
     "chess game logs at the time of the move"
 
     epd: "EPDString"
@@ -98,24 +98,28 @@ class Game:
     initial_pos: "EPDString"
     "game initial position"
 
-    players: list[str] = field(default_factory=lambda: ["White", "Black"])
+    players: 'list[str]' = field(default_factory=lambda: ["White", "Black"])
 
     board: BoardT = field(default_factory=create_board)
     "8x8 chess board"
 
-    castling: list[int] = field(default_factory=lambda: [1, 1, 1, 1])
+    castling: 'list[int]' = field(default_factory=lambda: [1, 1, 1, 1])
     "castling control"
 
     en_passant: Optional[CoordT] = None
     "En passant control"
 
-    epd_hash: dict["EPDString", int] = field(default_factory=dict)
+    epd_hash: 'dict["EPDString", int]' = field(default_factory=dict)
     "A table that keeps track of all EPD hashes of the game"
 
-    log: list[str] = field(default_factory=list)
+    log: 'list[str]' = field(default_factory=list)
     "chess game logs"
 
     last_move: Optional[Move] = None
+    "last move made"
+
+    captured: 'dict[int, list[int]]' = field(default_factory=lambda: {1: [], -1: []})
+    "captured pieces"
 
     x = X
     "X-axis"
@@ -204,6 +208,7 @@ class Game:
         return {
             "initial_pos": self.initial_pos,
             "players": self.players[:],
+            "captured": [self.captured[1][:], self.captured[-1][:]],
             "epd_hash": self.epd_hash.copy(),
             "epd": get_EPD(self),
             "log": self.log[:],
@@ -224,6 +229,12 @@ class Game:
         """
         new = cls(data["epd"])
         new.players = data["players"]
+        new.epd_hash = data["epd_hash"]
+        new.captured = {
+            1: data["captured"][0],
+            -1: data["captured"][1]
+        }
+        new.initial_pos = data["initial_pos"]
         new.log = data["log"]
         new.last_move = (
             Move.deserialize(data["last_move"]) if data["last_move"] else None

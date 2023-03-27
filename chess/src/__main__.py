@@ -1,8 +1,3 @@
-from src.ui.app import ChessApp
-
-
-def main():
-	app = ChessApp()
-	app.run()
+from .main import main
 
 main()
