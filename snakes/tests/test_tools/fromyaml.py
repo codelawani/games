@@ -7,8 +7,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 # Define the table structure (number of rows and columns)
 ROWS = 1
 COLUMNS = 7
-yamlfile = 'snakes_test.yaml'
-docxfile = 'test_snakes.docx'
+file = 'snakes_test.yaml'
 # Create a new Word document
 doc = docx.Document()
 
@@ -50,4 +49,4 @@ for test in tests:
     row_cells[6].text = str(test['Comment'])
 
 # Save the document
-doc.save(docxfile)
+doc.save('test_snakes.docx')

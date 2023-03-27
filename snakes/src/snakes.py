@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import random
 import sys
 import pydoc
@@ -39,6 +40,104 @@ Have fun playing!
 """
 
 
+def get_player_count(prompt):
+    """
+    Prompts the user to enter the number of players and validates the input.
+
+    Args:
+        prompt (str): A string prompt to be displayed to the user.
+
+    Returns:
+        int or None: The number of players entered by the user,
+        or None if the user entered '0' to quit the game.
+
+    """
+
+    print("Enter a number between 1 and 4")
+    print("Only 4 players allowed at a time")
+    while True:
+        try:
+            cprint("Enter q to quit the game".center(
+                32), "red", attrs=["blink"])
+            player_count = input(prompt)
+            if player_count == 'q':
+                return
+            if int(player_count) < 1:
+                cprint("Enter a number between 1 and 4.", "red")
+            elif int(player_count) > 4:
+                cprint("Sorry, we can't accommodate more than 4 players.\n",
+                       "red")
+            else:
+                return int(player_count)
+        except ValueError:
+            cprint("Invalid input: please enter a number.\n", "red")
+
+
+def display_quit_msg():
+    """Displays quit message
+    """
+    print("")
+    cprint("You quit!!! ".center(50, "="), "red", attrs=["bold"])
+    cprint("GAME OVER! Come back next time :)".center(50),
+           "black", attrs=["bold"])
+
+
+def create_player_dict(num_players):
+    """
+    Creates a dictionary of players with their bead and starting position.
+
+    Args:
+        num_players (int): The number of players in the game.
+
+    Returns:
+        dict: A dictionary of player names mapped to a list
+        containing their bead symbol and starting position.
+
+    """
+
+    def get_player_name(players, prompt):
+        """
+        Prompts the user to enter a player name and validates it.
+
+        Args:
+            players (dict): A dictionary of player names mapped
+            to their bead symbol and starting position.
+            prompt (str): A string prompt to be displayed to the user.
+
+        Returns:
+            str or None: The player's name entered by the user,
+            or None if the user entered '0' or 'q' to quit the game.
+
+        """
+        cprint("Enter q to quit the game".center(32),
+               "red", attrs=["blink"])
+        while True:
+            name = input(prompt).lower().strip()
+            print(name)
+            if name in ("0", "q"):
+                return
+            elif not name:
+                print("Please enter a name")
+            elif name not in players:
+                return name
+            else:
+                print("That name is already taken. Please try another name.")
+    print()
+
+    players = {}
+    rankings = ["first", "second", "third", "fourth"]
+    beads = ["@", "#", "%", "*"]
+    random.shuffle(beads)
+    for i in range(num_players):
+        player_name = get_player_name(
+            players, f"Enter {rankings[i]} player's name: ")
+        if not player_name:
+            return
+        players[player_name] = [beads[i], 1]
+        print(f"Your bead is: {colored(beads[i], 'blue', None, ['bold'])}")
+    return players
+
+
 def assign_bead_colors(players):
     """
     Assigns a unique color to each player's bead.
@@ -58,6 +157,43 @@ def assign_bead_colors(players):
     for player_name, (bead, _) in players.items():
         bead_colors[bead] = colors.pop()
     return bead_colors
+
+
+def get_random_player_order(players):
+    """Randomly shuffle the order of players in a game.
+
+    Args:
+    players (dict): A dictionary with the names
+        of players as keys and a list of
+        their bead and current position as values.
+
+    Returns:
+    list: A shuffled list of the player names.
+    """
+    random_players = list(players.keys()).copy()
+    random.shuffle(random_players)
+    return random_players
+
+
+def check_game_over(players):
+    """Check whether the game is over by checking if
+        any player has reached the winning position.
+
+    Args:
+    players (dict): A dictionary with the names
+        of players as keys and a list of
+        their bead and current position as values.
+
+    Returns:
+    tuple: A tuple containing a Boolean value and
+        the name of the winning player, if any.
+        The Boolean value is True
+        if the game is over and False otherwise.
+    """
+    for player_name, (bead, position) in players.items():
+        if position >= 100:
+            return (False, player_name)
+    return (True, player_name)
 
 
 def prepare_board():
@@ -188,132 +324,6 @@ def update_players(players, name, dice):
         print(f"{bluename} has now moved to \"{players[name][1]}\".\n")
 
 
-def get_player_count(prompt):
-    """
-    Prompts the user to enter the number of players and validates the input.
-
-    Args:
-        prompt (str): A string prompt to be displayed to the user.
-
-    Returns:
-        int or None: The number of players entered by the user,
-        or None if the user entered '0' to quit the game.
-
-    """
-
-    print("Enter a number between 1 and 4")
-    print("Only 4 players allowed at a time")
-    while True:
-        try:
-            cprint("Enter q to quit the game".center(
-                32), "red", attrs=["blink"])
-            player_count = input(prompt)
-            if player_count == 'q':
-                return
-            if int(player_count) < 1:
-                cprint("Enter a number between 1 and 4.", "red")
-            elif int(player_count) > 4:
-                cprint("Sorry, we can't accommodate more than 4 players.\n",
-                       "red")
-            else:
-                return int(player_count)
-        except ValueError:
-            cprint("Invalid input: please enter a number.\n", "red")
-
-
-def create_player_dict(num_players):
-    """
-    Creates a dictionary of players with their bead and starting position.
-
-    Args:
-        num_players (int): The number of players in the game.
-
-    Returns:
-        dict: A dictionary of player names mapped to a list
-        containing their bead symbol and starting position.
-
-    """
-
-    def get_player_name(players, prompt):
-        """
-        Prompts the user to enter a player name and validates it.
-
-        Args:
-            players (dict): A dictionary of player names mapped
-            to their bead symbol and starting position.
-            prompt (str): A string prompt to be displayed to the user.
-
-        Returns:
-            str or None: The player's name entered by the user,
-            or None if the user entered '0' or 'q' to quit the game.
-
-        """
-        cprint("Enter q to quit the game".center(32),
-               "red", attrs=["blink"])
-        while True:
-            name = input(prompt).lower().strip()
-            print(name)
-            if name in ("0", "q"):
-                return
-            elif not name:
-                print("Please enter a name")
-            elif name not in players:
-                return name
-            else:
-                print("That name is already taken. Please try another name.")
-    print()
-
-    players = {}
-    rankings = ["first", "second", "third", "fourth"]
-    beads = ["@", "#", "%", "*"]
-    random.shuffle(beads)
-    for i in range(num_players):
-        player_name = get_player_name(
-            players, f"Enter {rankings[i]} player's name: ")
-        if not player_name:
-            return
-        players[player_name] = [beads[i], 1]
-        print(f"Your bead is: {colored(beads[i], 'blue', None, ['bold'])}")
-    return players
-
-
-def get_random_player_order(players):
-    """Randomly shuffle the order of players in a game.
-
-    Args:
-    players (dict): A dictionary with the names
-        of players as keys and a list of
-        their bead and current position as values.
-
-    Returns:
-    list: A shuffled list of the player names.
-    """
-    random_players = list(players.keys()).copy()
-    random.shuffle(random_players)
-    return random_players
-
-
-def check_game_over(players):
-    """Check whether the game is over by checking if
-        any player has reached the winning position.
-
-    Args:
-    players (dict): A dictionary with the names
-        of players as keys and a list of
-        their bead and current position as values.
-
-    Returns:
-    tuple: A tuple containing a Boolean value and
-        the name of the winning player, if any.
-        The Boolean value is True
-        if the game is over and False otherwise.
-    """
-    for player_name, (bead, position) in players.items():
-        if position >= 100:
-            return (False, player_name)
-    return (True, player_name)
-
-
 def dice(chance):
     """
     This function takes an integer value 'chance' as input and
@@ -331,6 +341,9 @@ def dice(chance):
     -------
     None
     """
+    if not isinstance(chance, int) or chance < 1 or chance > 6:
+        raise ValueError(
+            "The 'chance' parameter must be an integer between 1 and 6 (inclusive).")
     dots = {1: ["     ", "  *  ", "     "],
             2: ["*    ", "     ", "    *"],
             3: ["*    ", "  *  ", "    *"],
@@ -344,15 +357,6 @@ def dice(chance):
         cprint(dots[chance][i].center(7), "yellow", attrs=["bold"], end="")
         print("|")
     print("".center(9, "-"), "\n")
-
-
-def display_quit_msg():
-    """Displays quit message
-    """
-    print("")
-    cprint("You quit!!! ".center(50, "="), "red", attrs=["bold"])
-    cprint("GAME OVER! Come back next time :)".center(50),
-           "black", attrs=["bold"])
 
 
 def play_game():
