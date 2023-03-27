@@ -1,4 +1,5 @@
 from itertools import cycle
+from typing import cast
 
 from rich import box
 from rich import print as rprint
@@ -68,18 +69,17 @@ class Chess(Game):
 
         for move in p_moves:
             x_game = self.copy()
-            x_game.move(get_loc(move[0]), get_loc(move[1]))  # Move piece
+            x_game.move(get_loc(move[0]), get_loc(move[1]), dummy=True)  # Move piece
             x_game.switch_player()
             i_moves = x_game.get_all_moves()  # Imaginary moves
             if not any(k_pos[0] in moves for moves in i_moves.values()):
                 c_escape.setdefault(move[0], list()).append(move[1])
             else:
-                rprint(
-                    f"[bold red]Bad Piece move detected![/]: {get_loc(move[0])} -> {get_loc(move[1])}"
-                )
+                pass
+                # print(f"Bad Piece move detected!: {get_loc(move[0])} -> {get_loc(move[1])}")
         for move in k_pos[1]:
             x_game = self.copy()
-            x_game.move(get_loc(k_pos[0]), get_loc(move))  # Move king
+            x_game.move(get_loc(k_pos[0]), get_loc(move), dummy=True)  # Move king
             x_game.switch_player()
             i_moves = x_game.get_all_moves()  # Imaginary moves
             if not any(
@@ -87,9 +87,8 @@ class Chess(Game):
             ):  # Check if moved king still in check
                 c_escape.setdefault(k_pos[0], list()).append(move)
             else:
-                rprint(
-                    f"[bold red]Bad King move detected![/]: {get_loc(k_pos[0])} -> {get_loc(move)}"
-                )
+                pass
+                # print(f"Bad King move detected!: {get_loc(k_pos[0])} -> {get_loc(move)}")
         if check:
             if len(c_escape) == 0:
                 self.log[-1] += "#"
@@ -253,7 +252,7 @@ class Chess(Game):
         board.add_row(*h_indicators)
         rprint(Panel.fit(board))
 
-    def move(self, curr_loc: str, next_loc: str):
+    def move(self, curr_loc: str, next_loc: str, dummy=False):
         """
         Move a piece on the board.
 
@@ -265,27 +264,33 @@ class Chess(Game):
         """
         cp: CoordT = get_coords(curr_loc)
         np: CoordT = get_coords(next_loc)
+        occupant = None
         # if self.valid_move(cp, np) == False:
         #     return False
         part = get_piece(self, cp)
         self.add_move_history(cp, np, part)
         if np == self.en_passant and (part == 1 or part == -1):
-            self.board[
-                self.en_passant[1] - (self.player * -1)  # type: ignore
-            ][
-                self.en_passant[0] # type: ignore
-            ] = 0  # type: ignore
+            en_passant = cast(CoordT, self.en_passant)
+            coords = (en_passant[0], en_passant[1] - (self.player * -1))
+            occupant = get_piece(self, coords)
+            set_piece(self, coords, 0)
         self.log_move(part, curr_loc, next_loc, cp, np)
         if (part == 1 and np[1] == 4) or (part == -1 and np[1] == 3):
             self.en_passant = (
                 (np[0], np[1] + 1) if part == 1 else (np[0], np[1] - 1)
             )
+            if not dummy:
+                print(f"En passant: {get_loc(self.en_passant)}")
         elif part == 6 * self.player and np[0] - cp[0] == 2:
-            self.board[np[1]][np[0] - 1] = 4 * self.player
-            self.board[np[1]][np[0] + 1] = 0
+            set_piece(self, (np[0] - 1, np[1]), 4 * self.player)
+            set_piece(self, (np[0] + 1, np[1]), 0)
+            # self.board[np[1]][np[0] - 1] = 4 * self.player
+            # self.board[np[1]][np[0] + 1] = 0
         elif part == 6 * self.player and np[0] - cp[0] == -2:
-            self.board[np[1]][np[0] + 1] = 4 * self.player
-            self.board[np[1]][np[0] - 2] = 0
+            set_piece(self, (np[0] + 1, np[1]), 4 * self.player)
+            set_piece(self, (np[0] - 2, np[1]), 0)
+            # self.board[np[1]][np[0] + 1] = 4 * self.player
+            # self.board[np[1]][np[0] - 2] = 0
         else:
             self.en_passant = None
         if part == 6 * self.player:
@@ -306,8 +311,9 @@ class Chess(Game):
                     self.castling[3] = 0
                 else:
                     self.castling[2] = 0
-        occupant = get_piece(self, np)
-        if occupant != 0:
+        if not occupant:
+            occupant = get_piece(self, np)
+        if occupant != 0 and not dummy:
             print("Captured: " + notations.get_name(occupant))
             self.captured[self.player].append(occupant)
         set_piece(self, cp, 0)

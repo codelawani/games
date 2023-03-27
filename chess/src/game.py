@@ -51,7 +51,10 @@ class Move:
     epd: "EPDString"
     "EPD hash of the game's state before the move"
 
+    captured: 'dict[int, list[int]]'
+
     next: Optional[Move] = None
+    "next(previous) move"
 
     def serialize(self) -> dict:
         """
@@ -67,6 +70,7 @@ class Move:
             "piece": self.piece,
             "log": self.log[:],
             "epd": self.epd,
+            "captured": [self.captured[1][:], self.captured[-1][:]],
             "next": self.next.serialize() if self.next else None,
         }
 
@@ -87,6 +91,7 @@ class Move:
             piece=data["piece"],
             log=data["log"],
             epd=data["epd"],
+            captured={1: data["captured"][0], -1: data["captured"][1]},
             next=cls.deserialize(data["next"]) if data["next"] else None,
         )
 
@@ -154,6 +159,7 @@ class Game:
             piece,
             self.log[:],
             get_EPD(self),
+            {1: self.captured[1][:], -1: self.captured[-1][:]},
             self.last_move,
         )
 
@@ -162,6 +168,8 @@ class Game:
         if self.last_move is None:
             return False
         load_EPD(self, self.last_move.epd)
+        self.captured = self.last_move.captured
+        self.log = self.last_move.log
         self.last_move = self.last_move.next
         return True
 

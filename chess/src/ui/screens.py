@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from textual.app import ComposeResult
 from textual.containers import Container, Grid, Horizontal
 from textual.screen import Screen
-from textual.widgets import Button, Input, Static
+from textual.widgets import Button, Input, Static, ListView
 
 from src.piece import notations
 
@@ -45,6 +45,25 @@ PROMOTION = r"""
 ██╔═══╝░██╔══██╗██║░░██║██║╚██╔╝██║██║░░██║░░░██║░░░██║██║░░██║██║╚████║╚═╝
 ██║░░░░░██║░░██║╚█████╔╝██║░╚═╝░██║╚█████╔╝░░░██║░░░██║╚█████╔╝██║░╚███║██╗
 ╚═╝░░░░░╚═╝░░╚═╝░╚════╝░╚═╝░░░░░╚═╝░╚════╝░░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═╝
+"""
+
+GAMEOVER = r"""
+░██████╗░░█████╗░███╗░░░███╗███████╗░█████╗░██╗░░░██╗███████╗██████╗░
+██╔════╝░██╔══██╗████╗░████║██╔════╝██╔══██╗██║░░░██║██╔════╝██╔══██╗
+██║░░██╗░███████║██╔████╔██║█████╗░░██║░░██║╚██╗░██╔╝█████╗░░██████╔╝
+██║░░╚██╗██╔══██║██║╚██╔╝██║██╔══╝░░██║░░██║░╚████╔╝░██╔══╝░░██╔══██╗
+╚██████╔╝██║░░██║██║░╚═╝░██║███████╗╚█████╔╝░░╚██╔╝░░███████╗██║░░██║
+░╚═════╝░╚═╝░░╚═╝╚═╝░░░░░╚═╝╚══════╝░╚════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝
+"""
+
+CHECKMATE = """
+█▀▀ █░█ █▀▀ █▀▀ █▄▀ █▀▄▀█ ▄▀█ ▀█▀ █▀▀ █ 
+█▄▄ █▀█ ██▄ █▄▄ █░█ █░▀░█ █▀█ ░█░ ██▄ ▄ 
+"""
+
+STALEMATE = """        
+█▀ ▀█▀ ▄▀█ █░░ █▀▀ █▀▄▀█ ▄▀█ ▀█▀ █▀▀ █ 
+▄█ ░█░ █▀█ █▄▄ ██▄ █░▀░█ █▀█ ░█░ ██▄ ▄
 """
 
 
@@ -89,7 +108,8 @@ class LoadPrevious(Screen):
         if event.button.id == "yes":
             game = Chess.load(FILE)
             self.app._game = game
-            _ = self.app.on_new_game(NewGame(self.app))
+            game_loaded = self.app.post_message(NewGame())
+            self.log(f"Game loaded: {game_loaded}")
             self.app.pop_screen()
         elif event.button.id == "no":
             FILE.write_text("")
@@ -272,8 +292,10 @@ class Welcome(Screen):
         game = Chess()
         game.players = [name1, name2]
         self.app._game = game
-        _ = self.app.on_new_game(NewGame(self.app))
+        new_game_started = self.app.post_message(NewGame())
+        self.log(f"New game started: {new_game_started}")
         self.app.pop_screen()
+        # self.app.call_after_refresh(self.app.action_update_board)
 
     def on_mount(self):
         Info = self.query_one("#info", Static)
@@ -356,5 +378,86 @@ class PawnPromotion(Screen):
         elif message.button.id == "knight":
             piece = notations.get_id("n")
         if piece is not None:
-            _ = self.app.on_piece_promotion(PiecePromotion(self, piece))
+            promoted = self.app.post_message(PiecePromotion(piece))
+            self.log(f"Promoted piece: {promoted}")
         self.app.pop_screen()
+
+
+class GameOver(Screen):
+    app: "ChessApp"
+
+    DEFAULT_CSS = """
+    #dialog {
+        grid-size: 2;
+        grid-gutter: 1 2;
+        padding: 1 2;
+        align: center middle;
+        width: 100%;
+        height: 70%;
+        margin-top: 2;
+    }
+
+    #title {
+        column-span: 2;
+        width: 100%;
+        color: $primary;
+    }
+
+    #subtitle {
+        column-span: 2;
+        width: 100%;
+        color: $secondary;
+    }
+
+    #question {
+        column-span: 2;
+        width: 100%;
+        content-align: center middle;
+    }
+
+    #dialog Horizontal {
+        column-span: 2;
+        width: 100%;
+        height: 100%;
+        align: center middle;
+        padding: 2;
+    }
+
+    #dialog Horizontal Button {
+        width: 50%;
+        margin: 2;
+    }
+
+    PlayerScore {
+        column-span: 2;
+        background: black;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        from .app import PlayerScore
+
+        yield Static(GAMEOVER, id="title")
+        if self.app.is_checkmated:
+            if self.app.game.player == 1:
+                winner = self.app.game.players[1]
+            else:
+                winner = self.app.game.players[0]
+            yield Static(CHECKMATE, id="subtitle")
+            yield Static(f"{winner.title()} Wins By Checkmate!", id="msg")
+        else:
+            yield Static(STALEMATE, id="subtitle")
+            yield Static("This Game Ended As A Draw", id="msg")
+        with Grid(id="dialog"):
+            yield PlayerScore()
+            yield Static("Would You Like To Play Again", id="question")
+            with Horizontal():
+                yield Button("New Game", variant="primary", id="new")
+                yield Button("Quit", variant="error", id="quit")
+
+    def on_button_pressed(self, message: Button.Pressed):
+        if message.button.id == "new":
+            self.app.pop_screen()
+            self.app.push_screen(Welcome())
+        elif message.button.id == "quit":
+            self.app.exit()

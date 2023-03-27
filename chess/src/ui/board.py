@@ -103,69 +103,42 @@ class Box(Static):
         """Handle a click on this box."""
         piece = get_piece(self.app.game, self.coords)
         player = self.app.game.player
-        if not self.app.selected_piece and piece == 0:
-            # the box is empty
-            self.log.error("Clicked on empty box")
-            return self.app.bell()
-        if not self.app.selected_piece and piece * player < 0:
-            # the piece belongs to the opponent
-            self.log.error("Clicked on opponent's piece")
-            return self.app.bell()
-        if self.app.selected_piece == self.coords:
-            # the box is already selected
-            self.log.info("Clicked on already selected box")
-            _ = self.app.on_piece_deselected(
-                PieceDeselected(self, self.coords)
-            )
+        if not self.app.selected_piece:
+            # no piece is selected
+            if piece == 0:
+                # the box is empty
+                self.log.error("Clicked on empty box")
+                return self.app.bell()
+            if piece * player < 0:
+                # the piece belongs to the opponent
+                self.log.error("Clicked on opponent's piece")
+                return self.app.bell()
+            # select the piece
+            self.log.info("Clicked on a piece")
+            selected = self.app.post_message(PieceSelected(self.coords))
+            self.log(f"selected: {selected}")
             return
-        if self.app.selected_piece and piece * player > 0:
-            # select a different piece
-            self.log.info("Clicked on another piece")
-            _ = self.app.on_piece_deselected(
-                PieceDeselected(self, self.coords)
-            )
-            _ = self.app.on_piece_selected(PieceSelected(self, self.coords))
-            return
-        # select a piece
-        self.log.info("Clicked on a piece")
-        _ = self.app.on_piece_selected(PieceSelected(self, self.coords))
-        return
-
-        # if the current player selects his piece again,
-        # the new piece selected should act as the new
-        # .selected piece
-        if selected := self.app.selected_piece:
-            # a box is already selected
-            if piece * player > 0:
-                # the current player owns the piece in this box
-                # select this box inplace of the previously
-                # selected box
-                box_id = "#box-" + get_loc(selected)
-                self.app.query_one(box_id, Box).deselect()
-                self.select()
-            elif self.has_class("valid"):
-                # the player is trying to move to this box
-                # it's a valid move!
-                self.app.move_piece(self.coords)
-                box_id = "#box-" + get_loc(selected)
-                for box in self.app.query(box_id):
-                    box.deselect()  # type: ignore
-            else:
-                self.app.bell()
-                self.log.error("Clicked on wrong box")
-        elif not self.is_empty():
-            if piece * player > 0:
-                # the piece belongs to the current player
-                self.select()
-            else:
-                self.app.bell()
-                if piece:
-                    self.log.error("Clicked on opponent's piece")
-                else:
-                    self.log.error("Clicked on empty box")
         else:
-            self.app.bell()
-            self.log.error("Clicked on empty box")
+            # a piece is already selected
+            if self.app.selected_piece == self.coords:
+                # the box is already selected
+                self.log.info("Clicked on already selected box")
+                deselected = self.app.post_message(PieceDeselected(self.coords))
+                self.log(f"deselected: {deselected}")
+                return
+            if piece * player > 0:
+                # select a different piece
+                self.log.info("Clicked on another piece")
+                deselected = self.app.post_message(PieceDeselected(self.coords))
+                selected = self.app.post_message(PieceSelected(self.coords))
+                self.log(f"deselected: {deselected}, selected: {selected}")
+                return
+            if self.has_class("valid"):
+                # move the piece
+                self.log.info("Clicked on a valid move")
+                self.app.post_message(PieceSelected(self.coords))
+                return
+            self.log.error("Clicked on an invalid move")
             return self.app.bell()
 
 

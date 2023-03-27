@@ -14,8 +14,8 @@ from ..game import FILE
 from ..piece import notations
 from .board import BoardArea, Box
 from .messages import (NewGame, PieceDeselected, PieceMoved, PiecePromotion,
-                       PieceSelected, SwitchPlayer)
-from .screens import LoadPrevious, PawnPromotion, QuitGame, Welcome
+                       PieceSelected, Refresh, SwitchPlayer)
+from .screens import GameOver, LoadPrevious, PawnPromotion, QuitGame, Welcome
 from rich.text import Text
 from rich.console import Group
 
@@ -30,6 +30,11 @@ class ActivePlayer(Static):
             return f"[white bold]{self.app.game.players[0].upper()}'s TURN!"
         else:
             return f"[white bold]{self.app.game.players[1].upper()}'s TURN!"
+    
+    def on_refresh(self, message: Refresh):
+        message.stop()
+        self.current_player = self.app.game.player
+
 
 
 class PlayerScore(DataTable):
@@ -42,10 +47,13 @@ class PlayerScore(DataTable):
         align: center middle;
         content-align: center middle;
         text-align: center;
+        margin-bottom: 2;
+        margin-top: 1;
     }
     """
 
-    def on_refresh(self):
+    def on_refresh(self, message: Refresh):
+        message.stop()
         scores = [0, 0]
         scores[0] = sum(notations.get_points(p) for p in self.app.game.captured[1])
         scores[1] = sum(notations.get_points(p) for p in self.app.game.captured[-1])
@@ -64,16 +72,18 @@ class PlayerScore(DataTable):
 
     def on_mount(self):
         self.show_cursor = False
-        self.on_refresh()
+        self.post_message(Refresh())
 
 class CapturedPieces(Static):
     app: "ChessApp"
 
     DEFAULT_CSS = """
     CapturedPieces {
-        border: solid $accent;
+        border: round $accent;
         text-align: left;
         color: $accent;
+        border-title-align: center;
+        margin-bottom: 1;
     }
     """
 
@@ -93,13 +103,14 @@ class CapturedPieces(Static):
             symbols.append(symbol)
         return " ".join(symbols)
 
-    def on_refresh(self):
+    def on_refresh(self, message: Refresh):
+        message.stop()
         self.pieces = self.app.game.captured[self.player]
         self.refresh(layout=True)
 
     def on_mount(self):
-        self.on_refresh()
-
+        self.border_title = self.app.game.players[0 if self.player == 1 else 1]
+        self.post_message(Refresh())
 
 class GameEPD(Static):
     app: "ChessApp"
@@ -114,20 +125,45 @@ class GameEPD(Static):
             move = move.next
         return "\n".join(epds)
 
-
 class Stats(Widget):
     app: "ChessApp"
+
+    DEFAULT_CSS = """
+    Stats Vertical {
+        border: blank $accent;
+        border-title-align: center;
+        width: 100%;
+        height: auto;
+        margin-bottom: 1;
+        padding-top: 2;
+    }
+        """
 
     def compose(self) -> ComposeResult:
         """Setup the stats."""
         yield ActivePlayer()
         yield PlayerScore()
-        yield Label(f"Captured By {self.app.game.players[0]}:")
-        yield CapturedPieces(1)
-        yield Label(f"Captured By {self.app.game.players[1]}:")
-        yield CapturedPieces(-1)
+        with Vertical():
+            yield CapturedPieces(1)
+            yield CapturedPieces(-1)
         # yield GameEPD()
 
+    def on_mount(self):
+        try:
+            vert = self.query_one(Vertical)
+            vert.border_title = "Captured Pieces"
+        except Exception:
+            pass
+    
+    def on_refresh(self, message: Refresh):
+        if self.query_one(ActivePlayer).post_message(Refresh()):
+            self.log.info("Refreshed ActivePlayer")
+        if self.query_one(PlayerScore).post_message(Refresh()):
+            self.log.info("Refreshed PlayerScore")
+        for node in self.query(CapturedPieces):
+            if node.post_message(Refresh()):
+                self.log.info("Refreshed CapturedPieces")
+        message.stop()
 
 class ChessApp(App):
     """Chess App."""
@@ -181,12 +217,14 @@ class ChessApp(App):
         for el in self.query(GameEPD):
             el.epd = get_EPD(self.game)
             break
-        try:
-            self.query_one(PlayerScore).on_refresh()
-            for widget in self.query(CapturedPieces):
-                widget.on_refresh()
-        except Exception:
-            pass
+        def update_stats():
+            try:
+                refreshed = self.query_one(Stats).post_message(Refresh())
+                self.log(f"Refreshed Stats: {refreshed}")
+            except Exception:
+                pass
+        self.call_after_refresh(update_stats)
+        return True
 
     def action_get_state(self):
         (
@@ -196,74 +234,82 @@ class ChessApp(App):
             self.valid_moves,
         ) = self.game.get_game_state()
 
+        self.log(f"on_check: {self.on_check}")
+        self.log(f"is_checkmated: {self.is_checkmated}")
+        self.log(f"is_stalemated: {self.is_stalemated}")
+        self.log(f"valid_moves: {self.valid_moves}")
+
         self.query("Box.valid").remove_class("valid")
         self.query("Box.check").remove_class("check")
         self.query("Box.selected").remove_class("selected")
 
+        def add_check_indicator(king_pos: CoordT):
+            try:
+                self.query_one(
+                    f"#box-{get_loc(king_pos)}",
+                    Box).add_class("check")
+            except Exception:
+                pass
+
         if self.on_check:
-            self.log(f"{self.game.player} is in check")
-            king_id = notations.get_id("k") * self.game.player
-            king_pos = find_piece(self.game, king_id)
-            self.call_after_refresh(
-                lambda: self.query_one(
-                    f"#box-{get_loc(king_pos)}", Box
-                ).add_class("check")
-            )
+            if self.is_checkmated:
+                self.log(f"{self.game.player} is checkmated")
+                self.push_screen(GameOver())
+            else:
+                self.log(f"{self.game.player} is in check")
+                king_id = notations.get_id("k") * self.game.player
+                king_pos = find_piece(self.game, king_id)
+                self.call_after_refresh(add_check_indicator, king_pos)
+        if self.is_stalemated:
+            self.log(f"{self.game.player} is stalemated")
+            self.push_screen(GameOver())
+        return True
+
+    def action_undo(self):
+        if self.game.undo_move():
+            updated = self.action_update_board()
+            self.log(f"Updated Board: {updated}")
+            if updated:
+                gotten = self.action_get_state()
+                self.log(f"Gotten State: {gotten}")
+        else:
+            self.bell()
+            self.log.warning("No moves to undo")
+        return True
+
+    def action_save(self):
+        self.game.save()
+        self.is_saved = True
+        return True
+
+    def on_switch_player(self, message: SwitchPlayer):
+        self.game.switch_player()
+        player = self.game.players[0 if self.game.player == 1 else 1]
+        self.sub_title = f"Player {player}"
+        updated = self.action_update_board()
+        self.log(f"Updated Board: {updated}")
+        if updated:
+            gotten = self.action_get_state()
+            self.log(f"Gotten State: {gotten}")
 
     def on_piece_moved(self, message: PieceMoved):
         self.is_saved = False
         if self.game._is_pawn_promotion():
             self.push_screen(PawnPromotion())
         else:
-            self.on_switch_player(SwitchPlayer(self))
-
-    def action_undo(self):
-        if self.game.undo_move():
-            self.action_update_board()
-            self.action_get_state()
-        else:
-            self.bell()
-            self.log.warning("No moves to undo")
-
-    def action_save(self):
-        self.game.save()
-        self.is_saved = True
-
-    def on_switch_player(self, message: SwitchPlayer):
-        self.game.switch_player()
-        player = self.game.players[0 if self.game.player == 1 else 1]
-        self.sub_title = f"Player {player}"
-        self.action_update_board()
-        self.action_get_state()
-
-    def move_piece(self, coords: CoordT):
-        """Move the selected piece to the given coords."""
-        if self.selected_piece is None:
-            return
-        self.log(f"Current Player: {self.game.player}")
-        piece = get_piece(self.game, self.selected_piece)
-        from_loc = get_loc(self.selected_piece)
-        to_loc = get_loc(coords)
-        self.log(
-            f"moving {notations.get_name(piece)} from {from_loc} to {to_loc}"
-        )
-        moved = self.game.move(from_loc, to_loc)
-        self.log(f"Moved: {moved}")
-        if moved:
-            self.on_piece_moved(PieceMoved(self))
+            switched = self.post_message(SwitchPlayer())
+            self.log(f"Switched Player: {switched}")
 
     def on_new_game(self, message: NewGame):
         self.is_saved = True
         player = self.game.players[0 if self.game.player == 1 else 1]
         self.sub_title = f"Player {player}"
         self.refresh(layout=True)
-        self.action_get_state()
-
-    def compose(self) -> ComposeResult:
-        """Setup the app."""
-        yield Header(name="Chess")
-        yield Horizontal(BoardArea(), Stats(), id="main")
-        yield Footer()
+        updated = self.action_update_board()
+        self.log(f"Updated Board: {updated}")
+        if updated:
+            gotten = self.action_get_state()
+            self.log(f"Gotten State: {gotten}")
 
     def on_mount(self):
         """Handle mounting the app."""
@@ -278,18 +324,16 @@ class ChessApp(App):
                 self.push_screen(LoadPrevious())
         else:
             self.push_screen(Welcome())
-        self.action_get_state()
+        # self.action_get_state()
 
     def on_piece_promotion(self, message: PiecePromotion):
         self.game.promote_pawn(message.promotion)
         if self.selected_piece:
-            self.on_piece_deselected(
-                PieceDeselected(self, self.selected_piece)
-            )
-        self.on_switch_player(SwitchPlayer(self))
-        self.call_after_refresh(
-            self.on_piece_deselected, PieceDeselected(self, (0, 0))
-        )
+            deselected = self.post_message(PieceDeselected(self.selected_piece))
+            self.log(f"Deselected Piece: {deselected}")
+        player_switched = self.post_message(SwitchPlayer())
+        self.log(f"Switched Player: {player_switched}")
+        self.call_after_refresh(self.post_message, PieceDeselected((0, 0)))
         self.call_after_refresh(self.action_update_board)
 
     def on_piece_selected(self, message: PieceSelected):
@@ -298,13 +342,11 @@ class ChessApp(App):
             self.selected_piece = message.coords
             self.query_one(f"#box-{get_loc(message.coords)}", Box).select()
             for move in self.valid_moves.get(message.coords, []):
-                self.log(f"Valid Move: {get_loc(move)}")
+                # self.log(f"Valid Move: {get_loc(move)}")
                 self.query_one(f"#box-{get_loc(move)}", Box).add_class("valid")
         else:
             self.move_piece(message.coords)
-            self.on_piece_deselected(
-                PieceDeselected(self, self.selected_piece)
-            )
+            self.post_message(PieceDeselected(self.selected_piece))
 
     def on_piece_deselected(self, message: PieceDeselected):
         """Handle a piece being deselected."""
@@ -313,7 +355,24 @@ class ChessApp(App):
         for box in self.query("Box.selected"):
             box.deselect()  # type: ignore
 
+    def move_piece(self, coords: CoordT):
+        """Move the selected piece to the given coords."""
+        if self.selected_piece is None:
+            return
+        self.log(f"Current Player: {self.game.player}")
+        piece = get_piece(self.game, self.selected_piece)
+        from_loc = get_loc(self.selected_piece)
+        to_loc = get_loc(coords)
+        self.log(
+            f"moving {notations.get_name(piece)} from {from_loc} to {to_loc}"
+        )
+        moved = self.game.move(from_loc, to_loc)
+        if moved:
+            moved = self.post_message(PieceMoved())
+            self.log(f"Piece Moved: {moved}")
 
-if __name__ == "__main__":
-    app = ChessApp()
-    app.run()
+    def compose(self) -> ComposeResult:
+        """Setup the app."""
+        yield Header(name="Chess")
+        yield Horizontal(BoardArea(), Stats(), id="main")
+        yield Footer()

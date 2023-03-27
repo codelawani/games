@@ -18,28 +18,31 @@ class PieceMoved(Message):
 class PiecePromotion(Message):
     """Message to promote a piece."""
 
-    def __init__(self, sender: MessageTarget, promotion: int) -> None:
-        super().__init__(sender)
+    def __init__(self, promotion: int) -> None:
+        super().__init__()
         self.promotion = promotion
 
 
 class PieceSelected(Message):
     """Message to select a piece."""
 
-    def __init__(self, sender: MessageTarget, coords: CoordT) -> None:
-        super().__init__(sender)
+    def __init__(self, coords: CoordT) -> None:
+        super().__init__()
         self.coords = coords
 
 
 class PieceDeselected(Message):
     """Message to deselect a piece."""
 
-    def __init__(self, sender: MessageTarget, coords: CoordT) -> None:
-        super().__init__(sender)
+    def __init__(self, coords: CoordT) -> None:
+        super().__init__()
         self.coords = coords
 
 
 class SwitchPlayer(Message):
     """Message to switch player."""
+    pass
 
+class Refresh(Message):
+    """Message to refresh the board."""
     pass
