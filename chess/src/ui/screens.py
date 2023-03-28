@@ -295,7 +295,7 @@ class Welcome(Screen):
         new_game_started = self.app.post_message(NewGame())
         self.log(f"New game started: {new_game_started}")
         self.app.pop_screen()
-        # self.app.call_after_refresh(self.app.action_update_board)
+        self.app.call_after_refresh(self.app.action_update_board)
 
     def on_mount(self):
         Info = self.query_one("#info", Static)

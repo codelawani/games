@@ -34,6 +34,7 @@ class ActivePlayer(Static):
     def on_refresh(self, message: Refresh):
         message.stop()
         self.current_player = self.app.game.player
+        self.refresh(layout=True)
 
 
 
@@ -105,11 +106,11 @@ class CapturedPieces(Static):
 
     def on_refresh(self, message: Refresh):
         message.stop()
+        self.border_title = self.app.game.players[0 if self.player == 1 else 1]
         self.pieces = self.app.game.captured[self.player]
         self.refresh(layout=True)
 
     def on_mount(self):
-        self.border_title = self.app.game.players[0 if self.player == 1 else 1]
         self.post_message(Refresh())
 
 class GameEPD(Static):
