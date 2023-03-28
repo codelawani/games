@@ -94,11 +94,11 @@ Box {
 
 
 Box.dark {
-	background: #152935;
+	background: #00235B;
 }
 
 Box.light {
-	background: #C0E6FF;
+	background: #8a2be2;
 }
 
 Box.selected {
