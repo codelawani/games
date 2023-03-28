@@ -425,7 +425,7 @@ class GameOver(Screen):
 
     #dialog Horizontal Button {
         width: 50%;
-        margin: 2;
+        margin: 0 2;
     }
 
     PlayerScore {
