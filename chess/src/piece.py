@@ -37,14 +37,49 @@ class Piece(ABC):
         pass
 
 
+PAWN = """
+█▀█
+█▀▀
+"""
+
+
+KNIGHT = """
+█▄░█
+█░▀█
+"""
+
+
+ROOK = """
+█▀█
+█▀▄
+"""
+
+
+BISHOP = """ 
+█▄▄
+█▄█
+"""
+
+QUEEN = """
+█▀█
+▀▀█
+"""
+
+KING = """
+█▄▀
+█░█
+"""
+
+
+
 class notations:
     pieces = (
-        PieceNotation(1, "pawn", "p", ("♙", "♟"), 1),
-        PieceNotation(2, "knight", "n", ("♘", "♞"), 3),
-        PieceNotation(3, "bishop", "b", ("♗", "♝"), 3),
-        PieceNotation(4, "rook", "r", ("♖", "♜"), 5),
-        PieceNotation(5, "queen", "q", ("♕", "♛"), 8),
-        PieceNotation(6, "king", "k", ("♔", "♚"), 0),
+        PieceNotation(1, "pawn", "p", (PAWN, PAWN), 1),
+        PieceNotation(2, "knight", "n", (KNIGHT, KNIGHT), 3),
+        PieceNotation(3, "bishop", "b", (BISHOP, BISHOP), 3),
+        PieceNotation(4, "rook", "r", (ROOK, ROOK), 5),
+        PieceNotation(5, "queen", "q", (QUEEN, QUEEN), 8),
+        PieceNotation(6, "king", "k", (KING, KING), 0),
     )
 
     @classmethod
@@ -63,7 +98,7 @@ class notations:
         v = 0 if variant == "outline" else 1
         for piece in cls.pieces:
             if piece.id == abs(id):
-                return piece.symbol[v]
+                return piece.symbol[v].strip()
         return ""
 
     @classmethod

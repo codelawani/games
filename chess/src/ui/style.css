@@ -1,3 +1,8 @@
+$highlight: #1B1725;
+$dark: #55286F;
+$light: #BC96E6;
+$text: #D8B4E2;
+
 * {
 	content-align: center middle;
 	text-align: center;
@@ -86,7 +91,7 @@ Stats Static {
 
 Box {
 	column-span: 1;
-	content-align: center middle;
+	content-align: center bottom;
 	min-height: 5;
 	min-width: 5;
 	padding: 0;
@@ -94,19 +99,19 @@ Box {
 
 
 Box.dark {
-	background: #152935;
+	background: $dark;
 }
 
 Box.light {
-	background: #C0E6FF;
+	background: $light;
 }
 
 Box.selected {
-	tint: $accent-lighten-1 70%;
+	tint: $highlight 70%;
 }
 
 Box.valid {
-	tint: $accent-lighten-3 30%;
+	tint: $highlight 30%;
 }
 
 Box.check {

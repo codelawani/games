@@ -3,3 +3,4 @@
 data__pycache__
 src/data
 src/ui/__pycache__
+src/ui/tk
