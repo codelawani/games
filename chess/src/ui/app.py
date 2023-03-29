@@ -97,7 +97,7 @@ class CapturedPieces(Static):
     def render(self) -> RenderableType:
         symbols = []
         for piece in self.pieces:
-            symbol = notations.get_symbol(piece)
+            symbol = notations.get_symbol(piece, variant="small")
             if not symbol:
                 self.log.error(f"Symbol not found for piece: {piece}")
                 continue

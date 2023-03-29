@@ -74,12 +74,12 @@ KING = """
 
 class notations:
     pieces = (
-        PieceNotation(1, "pawn", "p", (PAWN, PAWN), 1),
-        PieceNotation(2, "knight", "n", (KNIGHT, KNIGHT), 3),
-        PieceNotation(3, "bishop", "b", (BISHOP, BISHOP), 3),
-        PieceNotation(4, "rook", "r", (ROOK, ROOK), 5),
-        PieceNotation(5, "queen", "q", (QUEEN, QUEEN), 8),
-        PieceNotation(6, "king", "k", (KING, KING), 0),
+        PieceNotation(1, "pawn", "p", (PAWN, PAWN, "♟"), 1),
+        PieceNotation(2, "knight", "n", (KNIGHT, KNIGHT, "♞"), 3),
+        PieceNotation(3, "bishop", "b", (BISHOP, BISHOP, "♝"), 3),
+        PieceNotation(4, "rook", "r", (ROOK, ROOK, "♜"), 5),
+        PieceNotation(5, "queen", "q", (QUEEN, QUEEN, "♛"), 8),
+        PieceNotation(6, "king", "k", (KING, KING, "♚"), 0),
     )
 
     @classmethod
@@ -95,7 +95,7 @@ class notations:
                 A chess piece symbol or an empty string if
                 ID isn't associated with a chess piece.
         """
-        v = 0 if variant == "outline" else 1
+        v = 2 if variant == "small" else 1
         for piece in cls.pieces:
             if piece.id == abs(id):
                 return piece.symbol[v].strip()
