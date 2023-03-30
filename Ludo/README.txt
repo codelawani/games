@@ -16,7 +16,7 @@ The first player to move all of their tokens into the finish area wins the game.
 
 How To Play
 ===========
-* Change directory to the "Ludo" directory, the use
+* Change directory to the "Ludo" directory, then use
 
 	`python3 -m src`
 
@@ -35,6 +35,9 @@ Requirements
 
 - Python 3.8 and above
 - pygame
+
+To install requirements, run the code below:
+pip install -r requirements.txt
 
 
 
