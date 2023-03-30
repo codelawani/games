@@ -14,10 +14,9 @@ from   pygame import mixer
 import random
 import time
 import logging
-from rich.console import Console
-from IPython.terminal.embed import embed
+from pathlib import Path
 
-console = Console()
+SRC = Path(__file__).parent.joinpath("assets")
 
 # Initializing pygame
 
@@ -26,30 +25,30 @@ pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((680, 600))
 
 # Loading Images
-board = pygame.image.load('Board.jpg')
-star  = pygame.image.load('star.png')
-one   = pygame.image.load('1.png')
-two   = pygame.image.load('2.png')
-three = pygame.image.load('3.png')
-four  = pygame.image.load('4.png')
-five  = pygame.image.load('5.png')
-six   = pygame.image.load('6.png')
-dice_idle = pygame.image.load('Idle.png')
+board = pygame.image.load(SRC.joinpath('Board.jpg'))
+star  = pygame.image.load(SRC.joinpath('star.png'))
+one   = pygame.image.load(SRC.joinpath('1.png'))
+two   = pygame.image.load(SRC.joinpath('2.png'))
+three = pygame.image.load(SRC.joinpath('3.png'))
+four  = pygame.image.load(SRC.joinpath('4.png'))
+five  = pygame.image.load(SRC.joinpath('5.png'))
+six   = pygame.image.load(SRC.joinpath('6.png'))
+dice_idle = pygame.image.load(SRC.joinpath('Idle.png'))
 
-red    = pygame.image.load('red.png')
-blue   = pygame.image.load('blue.png')
-green  = pygame.image.load('green.png')
-yellow = pygame.image.load('yellow.png')
+red    = pygame.image.load(SRC.joinpath('red.png'))
+blue   = pygame.image.load(SRC.joinpath('blue.png'))
+green  = pygame.image.load(SRC.joinpath('green.png'))
+yellow = pygame.image.load(SRC.joinpath('yellow.png'))
 
 DICE  = [one, two, three, four, five, six]
 color = [red, green, yellow, blue]
 
 # Loading Sounds
 
-killSound   = mixer.Sound("Killed.wav")
-tokenSound  = mixer.Sound("Token Movement.wav")
-diceSound   = mixer.Sound("Dice Roll.wav")
-winnerSound = mixer.Sound("Reached Star.wav")
+killSound   = mixer.Sound(SRC.joinpath("Killed.wav"))
+tokenSound  = mixer.Sound(SRC.joinpath("Token Movement.wav"))
+diceSound   = mixer.Sound(SRC.joinpath("Dice Roll.wav"))
+winnerSound = mixer.Sound(SRC.joinpath("Reached Star.wav"))
 
 # Initializing Variables
 
@@ -125,12 +124,10 @@ def move_player(x: int, y: int):
     else:
         tokenSound.play()
 
-    # console.log(f"move_player: bliting current player")
     screen.blit(color[currentPlayer], (620, 28))
     screen.blit(currentPlayerText, (600, 10))
     screen.blit(line, (592, 59))
 
-    # console.log(f"move_player: updating display")
     for i in range(len(winnerRank)):
         rank = FONT.render(f'{i+1}.', True, (0, 0, 0))
         screen.blit(rank, (600, 85 + (40*i)))
@@ -298,27 +295,23 @@ def move_token(x: int, y: int, number: int, is_recurse: bool = False):
         #  R2
         # moving 
         if red_is_home():
-            console.print("R2")
             for i in range(number):
                 position[x][y][0] += 38
                 move_player(x, y)
 
         #  Y2
         elif yellow_is_home():
-            console.print("Y2")
             for i in range(number):
                 position[x][y][0] -= 38
                 move_player(x, y)
 
         #  G2
         elif green_is_home():
-            console.print("G2")
             for i in range(number):
                 position[x][y][1] += 38
                 move_player(x, y)
         #  B2
         elif blue_is_home():
-            console.print("B2")
             for i in range(number):
                 position[x][y][1] -= 38
                 move_player(x, y)
@@ -363,11 +356,9 @@ def move_token(x: int, y: int, number: int, is_recurse: bool = False):
                         if position[x][y] == list(i):
                             position[x][y] = list(jump[i])
                             break
-                console.print(f"{num_dup} moves left out of {number}")
                 move_player(x, y)
                 num_dup -= 1
                 if any((red_is_home(), yellow_is_home(), green_is_home(), blue_is_home())):
-                    console.print(f"{('RED', 'GREEN', 'YELLOW', 'BLUE')[x]} token {y + 1} is HOME")
                     move_token(x, y, num_dup, is_recurse=True)
                     break
         if is_recurse:
@@ -375,15 +366,9 @@ def move_token(x: int, y: int, number: int, is_recurse: bool = False):
         if not number == 6:
             currentPlayer = (currentPlayer + 1) % 4
             is_idle = True
-            # console.log("DICE is idle")
 
         # Killing Player
         kill_token(x, y)
-
-    print(f"{('RED', 'GREEN', 'YELLOW', 'BLUE')[x]} token {y + 1} moved to {position[x][y]}")
-     
-for i, clr in enumerate(("RED", "GREEN", "YELLOW", "BLUE")):
-    console.print(f"[{clr.lower()}]{clr}[/]: {position[i]}")
 
 # Checking Winner
 def check_winner():
@@ -404,19 +389,6 @@ running = True
 #     [[240, 126], [418, 107], [509, 107], [466, 153]], # GREEN
 #     [[520, 240], [418, 464], [509, 464], [466, 510]], # YELLOW
 #     [[328, 482], [61, 464], [152, 464], [110, 510]]] # BLUE
-
-while False:
-    screen.fill((255, 255, 255))
-    screen.blit(board, (0, 0)) # Bliting Board
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-    blit_all()
-    pygame.display.update()
-    embed()
-
-
 
 while(running):
     screen.fill((255, 255, 255))
@@ -446,7 +418,6 @@ while(running):
                         break
                 if (flag and number == 6) or not flag:
                     diceRolled = True
-                    # console.log("dice 🎲 is not idle")
                 else:
                     is_idle = False
                     blit_all()
@@ -458,10 +429,8 @@ while(running):
                     pygame.display.update()
                     sleep(0.4)
                     has_started = True
-                    # console.log("dice is rolled but not moved")
                     currentPlayer = (currentPlayer+1) % 4
                     is_idle = True
-                    # console.log("dice 🎲 is idle")
 
             # Moving Player
             elif diceRolled:
